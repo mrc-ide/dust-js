@@ -1,0 +1,7 @@
+node_modules
+dist
+lib
+.nyc_output
+coverage
+*.tgz
+docs

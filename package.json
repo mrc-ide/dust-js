@@ -1,0 +1,37 @@
+{
+    "name": "dust",
+    "version": "0.0.1",
+    "description": "Dust-like interface for js",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc",
+        "webpack": "webpack",
+        "test": "jest -c jest.config.js",
+        "lint": "tslint -c tslint.json 'src/*.ts' 'tests/*.ts'",
+        "docs": "typedoc"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mrc-ide/dust-js.git"
+    },
+    "author": "Rich FitzJohn <rich.fitzjohn@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mrc-ide/dust-js/issues"
+    },
+    "homepage": "https://github.com/mrc-ide/dust-js#readme",
+    "devDependencies": {
+        "@types/jest": "^28.1.4",
+        "@typescript-eslint/eslint-plugin": "^5.31.0",
+        "@typescript-eslint/parser": "^5.31.0",
+        "eslint": "^8.21.0",
+        "jest": "^28.1.2",
+        "ts-jest": "^28.0.5",
+        "ts-loader": "^9.3.1",
+        "tslint": "^6.1.3",
+        "typedoc": "^0.23.2",
+        "typescript": "^4.7.4",
+        "webpack": "^5.73.0",
+        "webpack-cli": "^4.10.0"
+    }
+}
