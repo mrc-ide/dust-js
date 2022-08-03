@@ -14,7 +14,7 @@ export type InternalStorage = Record<string, number | number[]>;
  * stripped-down version of the similar function in odin, and will be
  * replaced there later.
  */
-export function setParScalar(pars: ParsType, name: string,
+export function setParScalar(pars: Pars, name: string,
                              internal: InternalStorage,
                              defaultValue: number | null) {
     const value = pars[name];

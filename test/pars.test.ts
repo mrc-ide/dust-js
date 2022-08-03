@@ -1,4 +1,4 @@
-import { setParScalar, InternalStorage, ParsType } from "../src/pars";
+import { setParScalar, InternalStorage, Pars } from "../src/pars";
 
 describe("setParScalar", () => {
     const pars = { a: 1, b: 2.5, c: 3 };

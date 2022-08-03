@@ -2,7 +2,7 @@ import type { Random } from "@reside-ic/random";
 
 import type { base, BaseType } from "../src/base";
 import type { DustModel, DustModelInfo } from "../src/model";
-import type { InternalStorage, ParsType } from "../src/pars";
+import type { InternalStorage, Pars } from "../src/pars";
 
 // In contrast with the equivalent models in odin-js I'm leaving these
 // as TypeScript (not JS) for now to help get types right. That does
@@ -11,7 +11,7 @@ import type { InternalStorage, ParsType } from "../src/pars";
 export class Walk implements DustModel {
     private readonly internal: InternalStorage;
 
-    constructor(base: BaseType, pars: ParsType) {
+    constructor(base: BaseType, pars: Pars) {
         this.internal = {};
         base.pars.setParScalar(pars, "n", this.internal, 1);
         base.pars.setParScalar(pars, "sd", this.internal, 1);
