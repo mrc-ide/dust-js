@@ -68,13 +68,8 @@ export class Particle {
      *
      * @param index May be removed?
      */
-    public state(index: number[] | null): readonly number[] {
-        if (index === null) {
-            return this._y;
-        } else {
-            // TODO, this path is now never used
-            return index.map((i: number) => this._y[i]);
-        }
+    public state(): readonly number[] {
+        return this._y;
     }
 
     /**
