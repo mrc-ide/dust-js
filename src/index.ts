@@ -1,3 +1,8 @@
-export function add(x: number, y: number) {
-    return x + y;
-}
+export { base, BaseType } from "./base";
+export { InternalStorage, Pars } from "./pars";
+export {
+    DustModel,
+    DustModelConstructable,
+    DustModelInfo,
+    DustModelVariable
+} from "./model";
