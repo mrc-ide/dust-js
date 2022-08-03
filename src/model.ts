@@ -38,7 +38,8 @@ export interface DustModelVariable {
      * Length of the variable - if the variable represents a vector or
      * multidimensional array, then this is the length over all
      * dimensions. Scalars have length 1, so that the sum of all
-     * length elements within an {@link DustModelInfo} array
+     * length elements within an {@link DustModelInfo} array will
+     * equal the sum of the products of all `dim` elements.
      */
     length: number;
 
