@@ -15,13 +15,13 @@ export type DustModelConstructable = new(base: BaseType, pars: any) => DustModel
 /**
  * Information returned by an initialised model about itself
  */
-export type DustModelInfo = DustModelInfoElement[];
+export type DustModelInfo = DustModelVariable[];
 
 /**
  * Information about a single variable within a model, typically found
  * within {@link DustModelInfo}
  */
-export interface DustModelInfoElement {
+export interface DustModelVariable {
     /**
      * Dimensions of the variable.
      * * empty vector - a scalar
