@@ -65,8 +65,6 @@ export class Particle {
 
     /**
      * Return current particle state
-     *
-     * @param index May be removed?
      */
     public state(): readonly number[] {
         return this._y;
