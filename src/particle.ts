@@ -35,7 +35,7 @@ export class Particle {
         if (state === undefined) {
             this._y = model.initial(this.step);
         } else {
-            this._y = state.slice();
+            this._y = [...state];
         }
         this._yNext = Array(this.size).fill(0);
     }

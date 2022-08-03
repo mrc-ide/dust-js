@@ -53,11 +53,11 @@ export interface DustModelInfoElement {
 export interface DustModel {
     /**
      * Compute initial conditions
-     * @param step Step to compute initial conditionas at
+     * @param step Step to compute initial conditions at
      */
     initial(step: number): number[];
     /**
-     * Lenth of the state variables for this model
+     * Length of the state variables for this model
      */
     size(): number;
     /**

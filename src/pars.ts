@@ -6,7 +6,7 @@
  * numbers. Later we'll expand this to more exotic types and harmonise
  * with odin.
  */
-export type ParsType = Record<string, number>;
+export type Pars = Record<string, number>;
 
 export type InternalStorage = Record<string, number | number[]>;
 
