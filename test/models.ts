@@ -22,7 +22,8 @@ export class Walk implements DustModel {
     }
 
     public info(): DustModelInfo {
-        return [{dim: [1], length: this.internal.n as number, name: "x"}];
+        const n = this.internal.n as number;
+        return [{dim: [n], length: n, name: "x"}];
     }
 
     public initial(step: number): number[] {
