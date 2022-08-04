@@ -22,6 +22,7 @@
     "homepage": "https://github.com/mrc-ide/dust-js#readme",
     "devDependencies": {
         "@types/jest": "^28.1.4",
+        "@types/ndarray": "^1.0.11",
         "@typescript-eslint/eslint-plugin": "^5.31.0",
         "@typescript-eslint/parser": "^5.31.0",
         "eslint": "^8.21.0",
@@ -35,6 +36,7 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
-        "@reside-ic/random": "^0.0.3"
+        "@reside-ic/random": "^0.0.3",
+        "ndarray": "^1.0.19"
     }
 }
