@@ -1,4 +1,6 @@
-import { dustState, dustStateTime } from "../src/state";
+import { dustState } from "../src/state";
+import { dustStateTime } from "../src/state-time";
+
 
 describe("dust state at a single time point", () => {
     const nState = 5;
