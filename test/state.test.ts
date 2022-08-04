@@ -13,7 +13,7 @@ describe("dust state at a single time point", () => {
         expect(state.nParticles).toBe(nParticles);
     });
 
-    it("can extract a view of a particle", () => {
+    it("can extract a single particle", () => {
         const state = filledDustState(nState, nParticles);
         const p0 = state.viewParticle(0);
         expect(p0.get(0)).toBe(0);
@@ -26,7 +26,7 @@ describe("dust state at a single time point", () => {
         expect(state.getParticle(3)).toEqual([15, 16, 17, 18, 19]);
     });
 
-    it("can extract a view of a state", () => {
+    it("can extract a state across particles", () => {
         const state = filledDustState(nState, nParticles);
         const p0 = state.viewState(0);
         expect(p0.get(0)).toBe(0);
@@ -46,4 +46,13 @@ describe("dust state at a single time point", () => {
         expect(m[0]).toEqual(state.getParticle(0));
         expect(m[3]).toEqual(state.getParticle(3));
     });
+
+    it("can mutate extracted particle state", () => {
+        const state = filledDustState(nState, nParticles);
+        const p = state.viewParticle(3);
+        for (let i = 0; i < nState; ++i) {
+            p.set(i, -i);
+        }
+        expect(state.getParticle(3)).toEqual([-0, -1, -2, -3, -4]);
+    })
 });
