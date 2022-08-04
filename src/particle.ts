@@ -1,6 +1,7 @@
 import {Random} from "@reside-ic/random";
 
 import type {DustModel, DustModelConstructable, DustModelInfo} from "./model";
+import type {VectorView} from "./state";
 
 export class Particle {
     /** The step (in time) that the particle is currently at */
@@ -68,6 +69,29 @@ export class Particle {
      */
     public state(): readonly number[] {
         return this._y;
+    }
+
+    /**
+     * Copy particle state into a {@link VectorView} object, probably
+     * part of a {@link DustState} or {@link DustStateTime} object.
+     *
+     * @param index An index to use to restrict or order the copying
+     * of state. If non-`null`, then only the indicated states will be
+     * copied
+     *
+     * @param v The destination vector view to copy into
+     */
+    public copyState(index: number[] | null, v: VectorView): void {
+        const y = this._y;
+        if (index === null) {
+            for (let i = 0; i < y.length; ++i) {
+                v.set(i, y[i]);
+            }
+        } else {
+            for (let i = 0; i < index.length; ++i) {
+                v.set(i, y[index[i]]);
+            }
+        }
     }
 
     /**
