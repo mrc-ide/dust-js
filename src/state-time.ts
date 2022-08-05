@@ -25,7 +25,7 @@ export function dustStateTime(nState: number, nParticles: number,
  * DustState}. This object exists to simplify thinking about accessing
  * different parts of the data, as primitives for doing this don't
  * really exist in JavaScript. It also leaves us free to swap out the
- * underling storage later (currently using `ndarray`)
+ * underlying storage later (currently using `ndarray`)
  */
 export class DustStateTime {
     /** The underlying state */
