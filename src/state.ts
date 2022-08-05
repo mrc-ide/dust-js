@@ -16,7 +16,10 @@ export function dustState(nState: number, nParticles: number): DustState {
 
 /**
  * A one dimensional (slice) out of a {@link DustState} or {@link
- * DustStateTime} object
+ * DustStateTime} object. This is not really a new type, but just a
+ * restriction on the existing `ndarray.NdArray` type that means that
+ * TypeScript will expect exactly one index when using `get` and
+ * `set`, as `ndarray` does not have a vector type.
  */
 export interface VectorView {
     /** An array of length 1 containing the vector length */
@@ -107,7 +110,8 @@ export class DustState {
     /**
      * Create a matrix of particle states. The `i`th element of the
      * returned matrix is the state of the `i`th particle, itself a
-     * vector of length `nState`
+     * vector of length `nState`. This is a copy of the underlying
+     * data, decoupled from the state.
      */
     public asMatrix(): number[][] {
         const ret = [];

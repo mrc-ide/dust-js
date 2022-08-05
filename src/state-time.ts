@@ -100,9 +100,9 @@ export class DustStateTime {
     }
 
     /**
-     * Copy a single state across all variables at a single point in
-     * time into a plain JavaScript numeric array. This will then be
-     * decoupled from the underlying object
+     * Copy a single state variable across all particles at a single
+     * point in time into a plain JavaScript numeric array. This will
+     * then be decoupled from the underlying object
      * @param iState The index of the state to fetch
      * @param iTime The index of the time to fetch
      */
