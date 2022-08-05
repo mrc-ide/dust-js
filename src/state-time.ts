@@ -28,7 +28,7 @@ export function dustStateTime(nState: number, nParticles: number,
  * underling storage later (currently using `ndarray`)
  */
 export class DustStateTime {
-    /** The underling state */
+    /** The underlying state */
     public readonly state: ndarray.NdArray;
     /** The number of state elements per particle */
     public readonly nState;

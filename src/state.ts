@@ -107,7 +107,7 @@ export class DustState {
     /**
      * Create a matrix of particle states. The `i`th element of the
      * returned matrix is the state of the `i`th particle, itself a
-     * vector of lenth `nState`
+     * vector of length `nState`
      */
     public asMatrix(): number[][] {
         const ret = [];
