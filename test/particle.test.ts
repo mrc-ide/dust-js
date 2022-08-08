@@ -64,7 +64,7 @@ describe("Can create a particle", () => {
         const p = new Particle(new models.Walk(base, pars), 0);
         p.setState([2, 3, 4, 5, 6]);
         // Copy the full state into the second particle
-        p.copyState(null, state.viewParticle(1));
+        p.copyState(state.viewParticle(1), null);
         expect(state.getParticle(0)).toEqual([0, 0, 0, 0, 0]);
         expect(state.getParticle(1)).toEqual([2, 3, 4, 5, 6]);
     });
@@ -77,7 +77,7 @@ describe("Can create a particle", () => {
         const p = new Particle(new models.Walk(base, pars), 0);
         p.setState([2, 3, 4, 5, 6]);
         // Copy the indexed state into the second particle
-        p.copyState(index, state.viewParticle(1));
+        p.copyState(state.viewParticle(1), index);
         expect(state.getParticle(0)).toEqual([0, 0]);
         expect(state.getParticle(1)).toEqual([3, 5]);
     });
