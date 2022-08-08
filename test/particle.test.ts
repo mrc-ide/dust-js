@@ -2,6 +2,7 @@ import { Random, RngStateBuiltin, RngStateObserved } from "@reside-ic/random";
 
 import { base } from "../src/base";
 import { Particle } from "../src/particle";
+import { dustState } from "../src/state";
 
 import * as models from "./models";
 
@@ -55,4 +56,29 @@ describe("Can create a particle", () => {
         expect(p.info()).toEqual(
             [{dim: [1], length: 1, name: "x"}]);
     })
+
+    it("Can copy state into a vector view", () => {
+        const n = 5;
+        const state = dustState(n, 3);
+        const pars = {n, sd: 1};
+        const p = new Particle(new models.Walk(base, pars), 0);
+        p.setState([2, 3, 4, 5, 6]);
+        // Copy the full state into the second particle
+        p.copyState(state.viewParticle(1), null);
+        expect(state.getParticle(0)).toEqual([0, 0, 0, 0, 0]);
+        expect(state.getParticle(1)).toEqual([2, 3, 4, 5, 6]);
+    });
+
+    it("Can copy partial into a vector view", () => {
+        const n = 5;
+        const index = [1, 3];
+        const state = dustState(index.length, 3);
+        const pars = {n, sd: 1};
+        const p = new Particle(new models.Walk(base, pars), 0);
+        p.setState([2, 3, 4, 5, 6]);
+        // Copy the indexed state into the second particle
+        p.copyState(state.viewParticle(1), index);
+        expect(state.getParticle(0)).toEqual([0, 0]);
+        expect(state.getParticle(1)).toEqual([3, 5]);
+    });
 });
