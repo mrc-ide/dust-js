@@ -47,7 +47,7 @@ describe("dust state at a single time point", () => {
         expect(m[3]).toEqual(state.getParticle(3));
     });
 
-    it("can mutate extracted particle state", () => {
+    it("can mutate particle state via a view", () => {
         const state = filledDustState(nState, nParticles);
         const p = state.viewParticle(3);
         for (let i = 0; i < nState; ++i) {
