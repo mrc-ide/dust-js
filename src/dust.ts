@@ -97,11 +97,10 @@ export class Dust {
         if (model.size() !== this.nState()) {
             throw Error(`Particle produced unexpected state size`);
         }
-        for (let i = 0; i < this._particles.length; ++i) {
-            const state =
-                setInitialState ? undefined : this._particles[i].state();
-            this._particles[i] = new Particle(model, step, state);
-        }
+        this.forEachParticle((p: Particle, idx: number) => {
+            const state = setInitialState ? undefined : p.state();
+            this._particles[idx] = new Particle(model, step, state)
+        });
     }
 
     /**
@@ -122,9 +121,9 @@ export class Dust {
      */
     public setState(state: number[][]): void {
         this.checkState(state);
-        for (let i = 0; i < this.nParticles(); ++i) {
-            this._particles[i].setState(state[i]);
-        }
+        this.forEachParticle((p: Particle, idx: number) => {
+            p.setState(state[idx])
+        });
     }
 
     /**
@@ -152,10 +151,9 @@ export class Dust {
         const state = dustStateTime(nState, nParticles, nTime);
         for (let iTime = 0; iTime < nTime; ++iTime) {
             this.run(stepEnd[iTime]);
-            for (let iParticle = 0; iParticle < nParticles; ++iParticle) {
-                const v = state.viewParticle(iParticle, iTime);
-                this._particles[iParticle].copyState(v, index);
-            }
+            this.forEachParticle((p: Particle, idx: number) => {
+                p.copyState(state.viewParticle(idx, iTime), index);
+            });
         }
         return state;
     }
@@ -173,11 +171,14 @@ export class Dust {
         const nState = index === null ? this.nState() : index.length;
         const nParticles = this.nParticles();
         const state = dustState(nState, nParticles);
-        for (let iParticle = 0; iParticle < nParticles; ++iParticle) {
-            const v = state.viewParticle(iParticle);
-            this._particles[iParticle].copyState(v, index);
-        }
+        this.forEachParticle((p: Particle, idx: number) => {
+            p.copyState(state.viewParticle(idx), index);
+        });
         return state;
+    }
+
+    private forEachParticle(fn: (p: Particle, idx: number) => void) {
+        this._particles.forEach(fn);
     }
 
     private checkState(state: number[][]) {
