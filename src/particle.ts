@@ -98,10 +98,18 @@ export class Particle {
      * Set particle state
      *
      * @param state New state, must be of length `size`
+     *
+     * @param next Update the *next* state, rather than the current
+     * state. If `true`, then the particle state as returned by {@link
+     * Particle.state} will not be affected and you will need to call
+     * {@link Particle.swap} in order to make the state take
+     * effect. This is used when shuffling particles, via {@link
+     * Dust.reorder}.
      */
-    public setState(state: number[]): void {
+    public setState(state: readonly number[], next: boolean = false): void {
+        const dest = next ? this._yNext : this._y;
         for (let i = 0; i < state.length; ++i) {
-            this._y[i] = state[i];
+            dest[i] = state[i];
         }
     }
 
