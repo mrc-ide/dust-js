@@ -7,5 +7,6 @@ export {
     DustModelInfo,
     DustModelVariable
 } from "./model";
+export { Particle } from "./particle";
 export { dustState, DustState, VectorView } from "./state";
 export { dustStateTime, DustStateTime } from "./state-time";
