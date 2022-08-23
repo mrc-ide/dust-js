@@ -43,4 +43,13 @@ describe("dust state at multiple time points", () => {
         expect(state.getState(0, 5)).toEqual(t5.getState(0));
         expect(state.getState(3, 5)).toEqual(t5.getState(3));
     });
+
+    it("can extract a specific trace", () => {
+        const state = filledDustStateTime(nState, nParticles, nTime);
+        const expected = [0, 35, 70, 105, 140, 175, 210, 245, 280, 315, 350];
+        expect(state.getTrace(0, 0)).toEqual(expected);
+        expect(state.getTrace(1, 0)).toEqual(expected.map((x) => x + 1));
+        expect(state.getTrace(0, 1)).toEqual(expected.map((x) => x + 5));
+        expect(state.getTrace(1, 1)).toEqual(expected.map((x) => x + 6));
+    });
 });

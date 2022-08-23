@@ -88,6 +88,16 @@ export class DustStateTime {
         return this.state.pick(iTime, null, iState);
     }
 
+    /** Construct a {@link VectorView} for a single trace (or
+     * variable) for a single particle over all points in time. This
+     * can then be easily read from or written to.
+     * @param iState The index of the state to fetch
+     * @param iParticle The index of the particle to fetch
+     */
+    public viewTrace(iState: number, iParticle: number): VectorView {
+        return this.state.pick(null, iParticle, iState);
+    }
+
     /**
      * Copy the state for a single vector at a single point in time
      * into a plain JavaScript numeric array. This will then be
@@ -108,5 +118,16 @@ export class DustStateTime {
      */
     public getState(iState: number, iTime: number): number[] {
         return copyVector(this.viewState(iState, iTime));
+    }
+
+    /**
+     * Copy the state for a single trace of a variable for a single
+     * particle over all time points into a plain JavaScript numeric
+     * array. This will then be decoupled from the underlying object
+     * @param iState The index of the state to fetch
+     * @param iParticle The index of the particle to fetch
+     */
+    public getTrace(iState: number, iParticle: number): number[] {
+        return copyVector(this.viewTrace(iState, iParticle));
     }
 }
