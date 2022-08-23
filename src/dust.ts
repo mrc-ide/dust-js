@@ -177,6 +177,36 @@ export class Dust {
         return state;
     }
 
+    /**
+     * Reorder particle state among particles
+     *
+     * @param index An integer array of length `nParticles`, with
+     * values between 0 and `nParticles`, indicating the index of the
+     * particle that each particle should end up taking. So if the
+     * `i`th element is `j`, then after reordering particle `i` will
+     * have the state that particle `j` currently has. Indices can be
+     * repeated, and typically will be; i.e., this is a resampling
+     * rather than a strict shuffle.
+     */
+    public reorder(index: number[]): void {
+        const nParticles = this.nParticles();
+        if (index.length !== nParticles) {
+            throw Error(`Expected index to have length ${nParticles}` +
+                        ` but given ${index.length}`);
+        }
+        this.forEachParticle((p: Particle, idx: number) => {
+            const j = index[idx];
+            if (j < 0 || j >= nParticles) {
+                throw Error(`Expected index to be in [0, ${nParticles - 1}]` +
+                            ` but given ${j}`);
+            }
+            p.setState(this._particles[j].state(), true);
+        });
+        this.forEachParticle((p: Particle, idx: number) => {
+            p.swap();
+        });
+    }
+
     private forEachParticle(fn: (p: Particle, idx: number) => void) {
         this._particles.forEach(fn);
     }

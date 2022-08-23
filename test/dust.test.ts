@@ -231,3 +231,78 @@ describe("can set state", () => {
         expect(d.state(null).asMatrix()).toEqual(Array(3).fill([0, 0]))
     });
 });
+
+
+describe("can reorder particles", () => {
+    it("reorders without duplication", () => {
+        const pars = {n: 4, sd: 1};
+        const r = new RngStateObserved(new RngStateBuiltin());
+        const s = new Random(r);
+        const np = 3;
+        const d1 = new Dust(models.Walk, pars, np, 0, s);
+        const d2 = new Dust(models.Walk, pars, np, 0, new Random(r.replay()));
+        const state1 = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
+        const state2 = [[9, 10, 11, 12], [5, 6, 7, 8], [1, 2, 3, 4]];
+
+        d1.setState(state1);
+        d1.reorder([2, 1, 0]);
+
+        expect(d1.state(null).asMatrix()).toEqual(state2);
+        d1.run(1);
+
+        d2.setState(state2);
+        d2.run(1);
+
+        expect(d1.state(null).asMatrix()).toEqual(d1.state(null).asMatrix())
+    });
+
+    it("reorders with duplication", () => {
+        const pars = {n: 4, sd: 1};
+        const r = new RngStateObserved(new RngStateBuiltin());
+        const s = new Random(r);
+        const np = 3;
+        const d1 = new Dust(models.Walk, pars, np, 0, s);
+        const d2 = new Dust(models.Walk, pars, np, 0, new Random(r.replay()));
+        const state1 = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
+        const state2 = [[5, 6, 7, 8], [5, 6, 7, 8], [5, 6, 7, 8]];
+
+        d1.setState(state1);
+        d1.reorder([1, 1, 1]);
+
+        expect(d1.state(null).asMatrix()).toEqual(state2);
+        d1.run(1);
+
+        d2.setState(state2);
+        d2.run(1);
+
+        expect(d1.state(null).asMatrix()).toEqual(d1.state(null).asMatrix())
+    });
+
+    it("requires that index is the correct length", () => {
+        const pars = {n: 4, sd: 1};
+        const s = new Random(new RngStateBuiltin());
+        const np = 3;
+        const d = new Dust(models.Walk, pars, np, 0, s);
+        const state = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
+        d.setState(state);
+        expect(() => d.reorder([2, 1]))
+            .toThrow("Expected index to have length 3 but given 2");
+        expect(() => d.reorder([2, 1, 1, 2]))
+            .toThrow("Expected index to have length 3 but given 4");
+        expect(d.state(null).asMatrix()).toEqual(state);
+    });
+
+    it("requires that index values are in the correct range", () => {
+        const pars = {n: 4, sd: 1};
+        const s = new Random(new RngStateBuiltin());
+        const np = 3;
+        const d = new Dust(models.Walk, pars, np, 0, s);
+        const state = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
+        d.setState(state);
+        expect(() => d.reorder([2, 1, -1]))
+            .toThrow("Expected index to be in [0, 2] but given -1");
+        expect(() => d.reorder([2, 1, 3]))
+            .toThrow("Expected index to be in [0, 2] but given 3");
+        expect(d.state(null).asMatrix()).toEqual(state);
+    });
+});
