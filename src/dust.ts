@@ -118,12 +118,13 @@ export class Dust {
     /**
      * Change the model state
      *
-     * @param state A 2d-matrix of state; this inteface may change.
+     * @param state A 2d-matrix of state; this interface may change.
      */
-    public setState(state: number[][]): void {
+    public setState(state: number[][] | null): void {
+        const step = this.step();
         this.checkState(state);
         this.forEachParticle((p: Particle, idx: number) => {
-            p.setState(state[idx])
+            p.setState(state === null ? null : state[idx]);
         });
     }
 
@@ -212,7 +213,10 @@ export class Dust {
         this._particles.forEach(fn);
     }
 
-    private checkState(state: number[][]) {
+    private checkState(state: number[][] | null) {
+        if (state === null) {
+            return;
+        }
         if (state.length !== this.nParticles()) {
             throw Error(`Invalid length state, expected ${this.nParticles()}` +
                         ` but given ${state.length}`);

@@ -97,7 +97,9 @@ export class Particle {
     /**
      * Set particle state
      *
-     * @param state New state, must be of length `size`
+     * @param state New state, must be of length
+     * `size`. Alternatively, `null` resets the model state to the
+     * model default.
      *
      * @param next Update the *next* state, rather than the current
      * state. If `true`, then the particle state as returned by {@link
@@ -106,8 +108,12 @@ export class Particle {
      * effect. This is used when shuffling particles, via {@link
      * Dust.reorder}.
      */
-    public setState(state: readonly number[], next: boolean = false): void {
+    public setState(state: readonly number[] | null,
+                    next: boolean = false): void {
         const dest = next ? this._yNext : this._y;
+        if (state === null) {
+            state = this._model.initial(this.step);
+        }
         for (let i = 0; i < state.length; ++i) {
             dest[i] = state[i];
         }
