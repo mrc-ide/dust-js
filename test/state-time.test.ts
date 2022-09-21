@@ -11,7 +11,7 @@ describe("dust state at multiple time points", () => {
         expect(state.nState).toBe(nState);
         expect(state.nParticles).toBe(nParticles);
         expect(state.steps).toBe(steps);
-        expect(state.nTime).toBe(steps.length);
+        expect(state.nSteps).toBe(steps.length);
     });
 
     it("can extract a time view", () => {

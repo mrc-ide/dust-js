@@ -18,8 +18,8 @@ export function filledDustState(nState: number, nParticles: number) {
 }
 
 export function filledDustStateTime(nState: number, nParticles: number,
-                                    nTime: number) {
-    const steps = seq(0, nTime - 1);
+                                    nSteps: number) {
+    const steps = seq(0, nSteps - 1);
     const state = dustStateTime(nState, nParticles, steps);
     fillStateWithSequence(state.state);
     return state;

@@ -149,9 +149,9 @@ export class Dust {
     public simulate(stepEnd: number[], index: number[] | null): DustStateTime {
         const nState = index === null ? this.nState() : index.length;
         const nParticles = this.nParticles();
-        const nTime = stepEnd.length;
+        const nSteps = stepEnd.length;
         const state = dustStateTime(nState, nParticles, stepEnd);
-        for (let iTime = 0; iTime < nTime; ++iTime) {
+        for (let iTime = 0; iTime < nSteps; ++iTime) {
             this.run(stepEnd[iTime]);
             this.forEachParticle((p: Particle, idx: number) => {
                 p.copyState(state.viewParticle(idx, iTime), index);
