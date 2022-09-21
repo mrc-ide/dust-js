@@ -6,7 +6,7 @@ export function seq(a: number, b: number): number[] {
     return ret;
 }
 
-export function rep(x: any, n: number): Array<typeof x> {
+export function rep(x: any, n: number): (typeof x)[] {
     return Array(n).fill(x);
 }
 
