@@ -1,5 +1,7 @@
-import * as models from "./models";
 import { Dust } from "../src/dust";
+import { rep } from "../src/util";
+
+import * as models from "./models";
 import { approxEqualArray, repeat } from "./helpers";
 
 import {
@@ -230,8 +232,20 @@ describe("can set state", () => {
         // Unchanged:
         expect(d.state(null).asMatrix()).toEqual(Array(3).fill([0, 0]))
     });
-});
 
+    it("sets default state if passed null", () => {
+        const pars = {n: 4, sd: 1};
+        const r = new RngStateObserved(new RngStateBuiltin());
+        const s = new Random(r);
+        const np = 3;
+        const d = new Dust(models.Walk, pars, np, 0, s);
+        const state = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
+        d.setState(state);
+        expect(d.state(null).asMatrix()).toEqual(state);
+        d.setState(null);
+        expect(d.state(null).asMatrix()).toEqual(rep(rep(0, 4), 3));
+    });
+});
 
 describe("can reorder particles", () => {
     it("reorders without duplication", () => {
