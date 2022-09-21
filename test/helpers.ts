@@ -1,6 +1,7 @@
 import ndarray from "ndarray";
 import { dustState } from "../src/state";
 import { dustStateTime } from "../src/state-time";
+import { seq } from "../src/util";
 
 export function repeat<T>(n: number, f: () => T): T[] {
     const ret = [];
@@ -16,9 +17,10 @@ export function filledDustState(nState: number, nParticles: number) {
     return state;
 }
 
-export function filledDustStateTime(nState: number, nParticles:
-                                    number, nTime: number) {
-    const state = dustStateTime(nState, nParticles, nTime);
+export function filledDustStateTime(nState: number, nParticles: number,
+                                    nTime: number) {
+    const steps = seq(0, nTime - 1);
+    const state = dustStateTime(nState, nParticles, steps);
     fillStateWithSequence(state.state);
     return state;
 }

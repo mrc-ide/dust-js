@@ -10,13 +10,14 @@ import { copyVector, DustState, VectorView } from "./state";
  *
  * @param nParticles Number of particles
  *
- * @param nTime Number of time steps
+ * @param steps Array of steps that state is available at
  */
 export function dustStateTime(nState: number, nParticles: number,
-                              nTime: number) {
+                              steps: number[]) {
+    const nTime = steps.length;
     const data = ndarray(new Float64Array(nState * nParticles * nTime),
                          [nTime, nParticles, nState]);
-    return new DustStateTime(data, nState, nParticles, nTime);
+    return new DustStateTime(data, nState, nParticles, steps);
 }
 
 /**
@@ -36,6 +37,8 @@ export class DustStateTime {
     public readonly nParticles;
     /** The number of time steps */
     public readonly nTime;
+    /** The time steps */
+    public readonly steps;
 
     /**
      * Construct a new object - generally prefer {@link dustStateTime}
@@ -44,13 +47,14 @@ export class DustStateTime {
      * @param data The underlying data
      * @param nState The number of state elements per particle
      * @param nParticles The number of particles
-     * @param nTime The number of time steps
+     * @param steps Array of steps that state is available at
      */
     constructor(data: ndarray.NdArray, nState: number, nParticles: number,
-                nTime: number) {
+                steps: number[]) {
         this.nState = nState;
         this.nParticles = nParticles;
-        this.nTime = nTime;
+        this.nTime = steps.length;
+        this.steps = steps;
         this.state = data;
     }
 

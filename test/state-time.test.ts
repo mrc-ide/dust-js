@@ -5,16 +5,17 @@ import { filledDustStateTime } from "./helpers";
 describe("dust state at multiple time points", () => {
     const nState = 5;
     const nParticles = 7;
-    const nTime = 11;
+    const steps = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     it("can be constructed", () => {
-        const state = dustStateTime(nState, nParticles, nTime);
+        const state = dustStateTime(nState, nParticles, steps);
         expect(state.nState).toBe(nState);
         expect(state.nParticles).toBe(nParticles);
-        expect(state.nTime).toBe(nTime);
+        expect(state.steps).toBe(steps);
+        expect(state.nTime).toBe(steps.length);
     });
 
     it("can extract a time view", () => {
-        const state = filledDustStateTime(nState, nParticles, nTime);
+        const state = filledDustStateTime(nState, nParticles, steps);
         const t0 = state.viewTime(0);
         expect(t0.getParticle(0)).toEqual([0, 1, 2, 3, 4]);
         expect(t0.getParticle(3)).toEqual([15, 16, 17, 18, 19]);
@@ -24,7 +25,7 @@ describe("dust state at multiple time points", () => {
     });
 
     it("can extract a particle at a specific time", () => {
-        const state = filledDustStateTime(nState, nParticles, nTime);
+        const state = filledDustStateTime(nState, nParticles, steps);
         const t0 = state.viewTime(0);
         const t5 = state.viewTime(5);
         expect(state.getParticle(0, 0)).toEqual(t0.getParticle(0));
@@ -35,7 +36,7 @@ describe("dust state at multiple time points", () => {
 
     it("can extract a state at a specific time", () => {
         // Similar to above, but using getState, not getParticle
-        const state = filledDustStateTime(nState, nParticles, nTime);
+        const state = filledDustStateTime(nState, nParticles, steps);
         const t0 = state.viewTime(0);
         const t5 = state.viewTime(5);
         expect(state.getState(0, 0)).toEqual(t0.getState(0));
@@ -45,7 +46,7 @@ describe("dust state at multiple time points", () => {
     });
 
     it("can extract a specific trace", () => {
-        const state = filledDustStateTime(nState, nParticles, nTime);
+        const state = filledDustStateTime(nState, nParticles, steps);
         const expected = [0, 35, 70, 105, 140, 175, 210, 245, 280, 315, 350];
         expect(state.getTrace(0, 0)).toEqual(expected);
         expect(state.getTrace(1, 0)).toEqual(expected.map((x) => x + 1));

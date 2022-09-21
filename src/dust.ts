@@ -150,7 +150,7 @@ export class Dust {
         const nState = index === null ? this.nState() : index.length;
         const nParticles = this.nParticles();
         const nTime = stepEnd.length;
-        const state = dustStateTime(nState, nParticles, nTime);
+        const state = dustStateTime(nState, nParticles, stepEnd);
         for (let iTime = 0; iTime < nTime; ++iTime) {
             this.run(stepEnd[iTime]);
             this.forEachParticle((p: Particle, idx: number) => {
