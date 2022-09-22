@@ -12,6 +12,7 @@ import { DustStateTime, dustStateTime } from "./state-time";
  */
 export class Dust {
     private readonly _Model: DustModelConstructable;
+    private readonly _model: DustModel;
     private readonly _particles: Particle[];
     private readonly _random: Random;
 
@@ -46,9 +47,9 @@ export class Dust {
         // workers we might need to revisit this approach, but the API
         // there looks nothing like OpenMP and this would probably
         // still be ok, once per worker.
-        const model = new Model(base, pars);
+        this._model = new Model(base, pars);
         for (let i = 0; i < nParticles; ++i) {
-            this._particles.push(new Particle(model, step));
+            this._particles.push(new Particle(this._model, step));
         }
     }
 
@@ -207,6 +208,10 @@ export class Dust {
         this.forEachParticle((p: Particle, idx: number) => {
             p.swap();
         });
+    }
+
+    public model(): DustModel {
+        return this._model;
     }
 
     private forEachParticle(fn: (p: Particle, idx: number) => void) {
