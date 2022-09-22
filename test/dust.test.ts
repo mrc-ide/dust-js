@@ -230,7 +230,7 @@ describe("can set state", () => {
             "Invalid length state for particle 2, expected 2 but given 3");
 
         // Unchanged:
-        expect(d.state(null).asMatrix()).toEqual(Array(3).fill([0, 0]))
+        expect(d.state(null).asMatrix()).toEqual(Array(3).fill([0, 0]));
     });
 
     it("sets default state if passed null", () => {

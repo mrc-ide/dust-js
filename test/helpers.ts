@@ -70,3 +70,11 @@ export function approxEqualArray(x: Float64Array, y: Float64Array,
     }
     return xy < tolerance;
 }
+
+export function cumsum(x: number[]): number[] {
+    const ret: number[] = [];
+    x.forEach((el, i) => {
+        ret.push(i === 0 ? el : el + ret[i - 1]);
+    })
+    return ret;
+}
