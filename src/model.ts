@@ -1,6 +1,7 @@
-import {Random} from "@reside-ic/random";
+import { Random } from "@reside-ic/random";
 
-import {BaseType} from "./base";
+import { BaseType } from "./base";
+import { InternalStorage, Pars } from "./pars";
 
 /**
  * Constructor for a {@link DustModel}
@@ -10,7 +11,7 @@ import {BaseType} from "./base";
  * @param pars Parameters to pass to the model
  *
  */
-export type DustModelConstructable = new(base: BaseType, pars: any) => DustModel;
+export type DustModelConstructable = new(base: BaseType, pars: Pars) => DustModel;
 
 /**
  * Information returned by an initialised model about itself
