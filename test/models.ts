@@ -37,4 +37,8 @@ export class Walk implements DustModel {
             yNext[i] = random.normal(y[i], sd);
         }
     }
+
+    public getInternal(): InternalStorage {
+        return this.internal;
+    }
 }
