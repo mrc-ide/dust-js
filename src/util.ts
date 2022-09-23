@@ -26,3 +26,21 @@ export function mean(x: number[]): number {
 export function meanArray(y: number[][]) {
     return applyArray(y, mean);
 }
+
+export function combinations(arr: number[]): number[][] {
+    const ret: number[][] = [];
+    const n = seq(1, arr[0]);
+
+    if (arr.length > 1) {
+        const rest = combinations(arr.slice(1));
+        const ret = [];
+        for (let i = 0; i < rest.length; ++i) {
+            for (let j = 0; j < n.length; ++j) {
+                ret.push([n[j], ...rest[i]])
+            }
+        }
+        return ret;
+    } else {
+        return n.map((el: number) => [el]);
+    }
+}
