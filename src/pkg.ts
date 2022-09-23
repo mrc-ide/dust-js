@@ -11,6 +11,11 @@ import { copyVector } from "./state";
 // we'll eventually remove as it's not very useful. However, we need
 // to support the existing interface in order to complete the port of
 // the js support before doing any refactor in odin so here we are!
+//
+// The biggest sources of difference are:
+//
+// * how we handle metadata
+// * how we handle updating of parameters
 export class PkgWrapper {
     private readonly Model: DustModelConstructable;
     private pars: Pars;
