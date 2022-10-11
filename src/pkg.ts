@@ -50,8 +50,6 @@ export class PkgWrapper {
     }
 
     public getMetadata() {
-        // here, we want metadata in the format the the odin R package
-        // expects it, which is a bit peculiar.
         const info = this.model.info();
         return {
             info,
