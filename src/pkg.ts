@@ -23,10 +23,10 @@ export class PkgWrapper {
     private model: DustModel;
     private random: Random;
 
-    constructor(Model: DustModelConstructable, pars: Pars, random?: Random) {
+    constructor(Model: DustModelConstructable, pars: Pars, rng?: RngState) {
         this.Model = Model;
         this.pars = pars;
-        this.random = random || new Random(new RngStateBuiltin());
+        this.random = new Random(rng || new RngStateBuiltin());
         this.model = new this.Model(base, pars);
     }
 
