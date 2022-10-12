@@ -30,8 +30,12 @@ export class PkgWrapper {
         this.model = new this.Model(base, pars);
     }
 
-    public setUser(pars: Pars) {
-        this.pars = pars;
+    public static random(rng?: RngState) {
+        return new Random(rng || new RngStateBuiltin());
+    }
+
+    public setUser(pars: Pars, unusedUserAction: any) {
+        this.pars = pars; // TODO: { ...this.pars, pars };
         this.model = new this.Model(base, pars);
     }
 
