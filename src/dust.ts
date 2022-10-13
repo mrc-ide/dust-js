@@ -1,8 +1,12 @@
 import { Random, RngState } from "@reside-ic/random";
 
 import { base } from "./base";
-import type { DustModel, DustModelInfo, DustModelConstructable } from "./model";
-import { Pars } from "./pars";
+import type {
+    DustModel,
+    DustModelInfo,
+    DustModelConstructable,
+    UserType
+} from "./model";
 import { Particle } from "./particle";
 import { DustState, dustState } from "./state";
 import { DustStateTime, dustStateTime } from "./state-time";
@@ -27,7 +31,7 @@ export class Dust {
      *
      * @param random The random state
      */
-    constructor(Model: DustModelConstructable, pars: Pars, nParticles: number,
+    constructor(Model: DustModelConstructable, pars: UserType, nParticles: number,
                 step: number, random: Random) {
         if (nParticles <= 0) {
             throw Error("Expected at least one particle");
@@ -90,7 +94,7 @@ export class Dust {
      * model's `initial()` method. This uses the current step of the
      * model, so you may want to use {@link Dust.setStep} first.
      */
-    public setPars(pars: Pars, setInitialState: boolean): void {
+    public setPars(pars: UserType, setInitialState: boolean): void {
         const step = this.step();
         const nState = this.nState();
         const model = new this._Model(base, pars);
