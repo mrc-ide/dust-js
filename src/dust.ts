@@ -121,7 +121,7 @@ export class Dust {
     /**
      * Change the model state
      *
-     * @param state A 2d-matrix of state; this inteface may change.
+     * @param state A 2d-matrix of state; this interface may change.
      */
     public setState(state: number[][]): void {
         this.checkState(state);

@@ -83,4 +83,10 @@ export interface DustModel {
      * @param random The random state, used for any stochastic updates
      */
     update(step: number, y: readonly number[], yNext: number[], random: Random): void;
+
+    /**
+     * Return the state of the internal storage - odin uses this for
+     * debugging and testing.
+     */
+    getInternal(): InternalStorage;
 }
