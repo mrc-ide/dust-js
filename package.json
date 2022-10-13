@@ -1,5 +1,5 @@
 {
-    "name": "dust",
+    "name": "@reside-ic/dust",
     "version": "0.0.1",
     "description": "Dust-like interface for js",
     "main": "index.js",
