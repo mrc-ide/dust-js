@@ -73,6 +73,14 @@ describe("wrapper", () => {
         // expect(y.info).toStrictEqual(mod.getMetadata());
         expect(y.y).toStrictEqual(cumsum([10, ...repeat(4, () => cmp.normal(0, 1))]));
     });
+
+    it("can create a random object staticically", () => {
+        const rng = new RngStateObserved(new RngStateBuiltin());
+        const r1 = PkgWrapper.random(rng);
+        const r2 = PkgWrapper.random(rng.replay());
+        const y = repeat(10, () => r1.randomNormal());
+        expect(y).toEqual(repeat(10, () => r2.randomNormal()));
+    });
 });
 
 describe("variableNames", () => {

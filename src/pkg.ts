@@ -29,8 +29,8 @@ export class PkgWrapper {
         this.model = new this.Model(base, pars);
     }
 
-    public static random(rng?: RngState) {
-        return new Random(rng || new RngStateBuiltin());
+    public static random(rng: RngState) {
+        return new Random(rng);
     }
 
     public setUser(pars: UserType) {
