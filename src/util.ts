@@ -12,10 +12,10 @@ export function combinations(arr: number[]): number[][] {
 
     if (arr.length > 1) {
         const rest = combinations(arr.slice(1));
-        const ret = [];
-        for (let i = 0; i < rest.length; ++i) {
-            for (let j = 0; j < n.length; ++j) {
-                ret.push([n[j], ...rest[i]])
+        const ret = [] as number[][];
+        for (const i of rest) {
+            for (const j of n) {
+                ret.push([j, ...i]);
             }
         }
         return ret;

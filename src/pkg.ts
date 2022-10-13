@@ -79,7 +79,7 @@ export class PkgWrapper {
 
 export function variableNames(info: DustModelInfo): string[] {
     const ret: string[] = [];
-    for (let el of info) {
+    for (const el of info) {
         const { dim, name } = el;
         if (dim.length === 0) {
             ret.push(name);

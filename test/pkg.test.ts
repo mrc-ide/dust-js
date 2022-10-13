@@ -2,7 +2,7 @@ import {
     Random, RngStateBuiltin, RngState, RngStateObserved
 } from "@reside-ic/random";
 
-import { PkgWrapper } from "../src/pkg";
+import { PkgWrapper, variableNames } from "../src/pkg";
 
 import * as models from "./models";
 import { cumsum, repeat } from "./helpers";
@@ -72,5 +72,32 @@ describe("wrapper", () => {
         const y = mod.run([0, 1, 2, 3, 4], [10]);
         // expect(y.info).toStrictEqual(mod.getMetadata());
         expect(y.y).toStrictEqual(cumsum([10, ...repeat(4, () => cmp.normal(0, 1))]));
+    });
+});
+
+describe("variableNames", () => {
+    it("can generate simple names", () => {
+        expect(variableNames([{ dim: [], length: 1, name: "x" }]))
+            .toEqual(["x"]);
+        expect(variableNames([
+            { dim: [], length: 1, name: "x" },
+            { dim: [], length: 1, name: "y" }
+        ])).toEqual(["x", "y"]);
+    });
+
+    it("can generate vector names", () => {
+        expect(variableNames([
+            { dim: [3], length: 3, name: "x" }
+        ])).toEqual(["x[1]", "x[2]", "x[3]"]);
+        expect(variableNames([
+            { dim: [], length: 1, name: "x" },
+            { dim: [3], length: 3, name: "y" }
+        ])).toEqual(["x", "y[1]", "y[2]", "y[3]"]);
+    });
+
+    it("can generate matrix names", () => {
+        expect(variableNames([
+            { dim: [2, 3], length: 3, name: "x" }
+        ])).toEqual(["x[1,1]", "x[2,1]", "x[1,2]", "x[2,2]", "x[1,3]", "x[2,3]"]);
     });
 });
