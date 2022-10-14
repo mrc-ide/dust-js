@@ -2,7 +2,13 @@ import { Random, RngState, RngStateBuiltin } from "@reside-ic/random";
 
 import { base } from "./base";
 import { Dust } from "./dust";
-import { DustModel, DustModelInfo, DustModelConstructable, InternalStorage, UserType } from "./model";
+import {
+    DustModel,
+    DustModelInfo,
+    DustModelConstructable,
+    InternalStorage,
+    UserType
+} from "./model";
 import { copyVector } from "./state";
 import { combinations } from "./util";
 
@@ -11,31 +17,27 @@ import { combinations } from "./util";
 // we'll eventually remove as it's not very useful. However, we need
 // to support the existing interface in order to complete the port of
 // the js support before doing any refactor in odin so here we are!
-//
-// The biggest sources of difference are:
-//
-// * how we handle metadata
-// * how we handle updating of parameters
 export class PkgWrapper {
     private readonly Model: DustModelConstructable;
     private pars: UserType;
     private model: DustModel;
     private random: Random;
 
-    constructor(Model: DustModelConstructable, pars: UserType, rng?: RngState) {
+    constructor(Model: DustModelConstructable, pars: UserType,
+                unusedUserAction: string, rng?: RngState) {
         this.Model = Model;
         this.pars = pars;
         this.random = new Random(rng || new RngStateBuiltin());
-        this.model = new this.Model(base, pars);
+        this.model = new this.Model(base, pars, unusedUserAction);
     }
 
     public static random(rng: RngState) {
         return new Random(rng);
     }
 
-    public setUser(pars: UserType) {
-        this.pars = pars; // TODO: { ...this.pars, pars };
-        this.model = new this.Model(base, pars);
+    public setUser(pars: UserType, unusedUserAction: string) {
+        this.pars = pars;
+        this.model = new this.Model(base, pars, unusedUserAction);
     }
 
     public initial(step: number): number[] {
@@ -64,7 +66,8 @@ export class PkgWrapper {
     public run(step: number[], y: number[] | null) {
         const stepStart = step[0];
         const nParticles = 1;
-        const dust = new Dust(this.Model, this.pars, nParticles, stepStart, this.random);
+        const dust = new Dust(this.Model, this.pars, nParticles, stepStart,
+                              this.random);
         if (y !== null) {
             dust.setState([y]);
         }
@@ -84,7 +87,8 @@ export function variableNames(info: DustModelInfo): string[] {
         if (dim.length === 0) {
             ret.push(name);
         } else {
-            ret.push(...combinations(dim).map((i) => `${name}[${i.join(",")}]`));
+            ret.push(...combinations(dim).map(
+                (i) => `${name}[${i.join(",")}]`));
         }
     }
     return ret;

@@ -13,7 +13,7 @@ export { InternalStorage, UserType };
  * @param pars Parameters to pass to the model
  *
  */
-export type DustModelConstructable = new(base: BaseType, pars: UserType) => DustModel;
+export type DustModelConstructable = new(base: BaseType, pars: UserType, unusedUserAction: string) => DustModel;
 
 /**
  * Information returned by an initialised model about itself

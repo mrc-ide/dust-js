@@ -10,8 +10,9 @@ import type { DustModel, DustModelInfo, InternalStorage, UserType } from "../src
 export class Walk implements DustModel {
     private readonly internal: InternalStorage;
 
-    constructor(base: BaseType, pars: UserType) {
+    constructor(base: BaseType, pars: UserType, unusedUserAction: string = "ignore") {
         this.internal = {};
+        base.user.checkUser(pars, ["n", "sd"], unusedUserAction);
         base.user.setUserScalar(pars, "n", this.internal, 1,
                                 -Infinity, Infinity, false);
         base.user.setUserScalar(pars, "sd", this.internal, 1,

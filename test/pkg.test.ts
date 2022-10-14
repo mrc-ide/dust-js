@@ -12,7 +12,7 @@ describe("wrapper", () => {
         const rng = new RngStateObserved(new RngStateBuiltin());
         const cmp = new Random(rng.replay());
         const pars = {};
-        const mod = new PkgWrapper(models.Walk, pars, rng);
+        const mod = new PkgWrapper(models.Walk, pars, "ignore", rng);
 
         expect(mod.initial(0)).toEqual([0]);
         const y = mod.update(0, [0]);
@@ -24,7 +24,7 @@ describe("wrapper", () => {
 
     it("can get model metadata", () => {
         const pars = {n: 5, sd: 2};
-        const mod = new PkgWrapper(models.Walk, pars);
+        const mod = new PkgWrapper(models.Walk, pars, "ignore");
         const meta = mod.getMetadata();
         expect(meta).toStrictEqual({
             info: [{ dim: [5], length: 5, name: "x" }],
@@ -35,7 +35,7 @@ describe("wrapper", () => {
 
     it("can get model internals", () => {
         const pars = {n: 5, sd: 2};
-        const mod = new PkgWrapper(models.Walk, pars);
+        const mod = new PkgWrapper(models.Walk, pars, "ignore");
         const internal = mod.getInternal();
         expect(internal).toStrictEqual({ n: 5, sd: 2 });
     });
@@ -44,11 +44,11 @@ describe("wrapper", () => {
         const rng = new RngStateObserved(new RngStateBuiltin());
         const cmp = new Random(rng.replay());
         const pars = {};
-        const mod = new PkgWrapper(models.Walk, pars, rng);
+        const mod = new PkgWrapper(models.Walk, pars, "ignore", rng);
         expect(mod.getInternal()).toEqual({ n: 1, sd: 1 });
         const y1 = mod.update(0, [0]);
         expect(y1).toStrictEqual([cmp.normal(0, 1)]);
-        mod.setUser({ n: 1, sd: 2 });
+        mod.setUser({ n: 1, sd: 2 }, "ignore");
         expect(mod.getInternal()).toEqual({ n: 1, sd: 2 });
         const y2 = mod.update(0, [0]);
         expect(y2).toStrictEqual([cmp.normal(0, 2)]);
@@ -58,7 +58,7 @@ describe("wrapper", () => {
         const rng = new RngStateObserved(new RngStateBuiltin());
         const cmp = new Random(rng.replay());
         const pars = {};
-        const mod = new PkgWrapper(models.Walk, pars, rng);
+        const mod = new PkgWrapper(models.Walk, pars, "ignore", rng);
         const y = mod.run([0, 1, 2, 3, 4], null);
         // expect(y.info).toStrictEqual(mod.getMetadata());
         expect(y.y).toStrictEqual(cumsum([0, ...repeat(4, () => cmp.normal(0, 1))]));
@@ -68,7 +68,7 @@ describe("wrapper", () => {
         const rng = new RngStateObserved(new RngStateBuiltin());
         const cmp = new Random(rng.replay());
         const pars = {};
-        const mod = new PkgWrapper(models.Walk, pars, rng);
+        const mod = new PkgWrapper(models.Walk, pars, "ignore", rng);
         const y = mod.run([0, 1, 2, 3, 4], [10]);
         // expect(y.info).toStrictEqual(mod.getMetadata());
         expect(y.y).toStrictEqual(cumsum([10, ...repeat(4, () => cmp.normal(0, 1))]));
@@ -80,6 +80,16 @@ describe("wrapper", () => {
         const r2 = PkgWrapper.random(rng.replay());
         const y = repeat(10, () => r1.randomNormal());
         expect(y).toEqual(repeat(10, () => r2.randomNormal()));
+    });
+
+    it("can react to unexpected parameters", () => {
+        // This is different to the base dust interface, but required
+        // for the R wrapper to work correctly.
+        const pars = {n: 5, sd: 2};
+        const mod = new PkgWrapper(models.Walk, pars, "stop");
+        expect(mod.getInternal()).toStrictEqual(pars);
+        expect(() => new PkgWrapper(models.Walk, { ...pars, other: 1 }, "stop"))
+            .toThrow("Unknown user parameters: other");
     });
 });
 
