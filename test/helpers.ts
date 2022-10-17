@@ -77,3 +77,7 @@ export function cumsum(x: number[]): number[] {
     })
     return ret;
 }
+
+export function rep(x: any, n: number): (typeof x)[] {
+    return Array(n).fill(x);
+}
