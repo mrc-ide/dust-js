@@ -36,6 +36,7 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
+        "@reside-ic/odinjs": "^0.0.15",
         "@reside-ic/random": "^0.0.3",
         "ndarray": "^1.0.19"
     }

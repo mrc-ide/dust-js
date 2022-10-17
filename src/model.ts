@@ -1,6 +1,9 @@
-import {Random} from "@reside-ic/random";
+import { Random } from "@reside-ic/random";
+import { InternalStorage, UserType } from "@reside-ic/odinjs";
 
-import {BaseType} from "./base";
+import { BaseType } from "./base";
+
+export { InternalStorage, UserType };
 
 /**
  * Constructor for a {@link DustModel}
@@ -10,7 +13,7 @@ import {BaseType} from "./base";
  * @param pars Parameters to pass to the model
  *
  */
-export type DustModelConstructable = new(base: BaseType, pars: any) => DustModel;
+export type DustModelConstructable = new(base: BaseType, pars: UserType) => DustModel;
 
 /**
  * Information returned by an initialised model about itself
