@@ -12,6 +12,11 @@ export { InternalStorage, UserType };
  *
  * @param pars Parameters to pass to the model
  *
+ * @param unusedUserAction String describing the behaviour if unused
+ * values are found in `pars`. Typically this should be the string
+ * "ignore" for dust models but for compatibility with odin (and use
+ * with {@link PkgWrapper}) the values "message", "warning" and "stop"
+ * are supported.
  */
 export type DustModelConstructable = new(base: BaseType, pars: UserType, unusedUserAction: string) => DustModel;
 
