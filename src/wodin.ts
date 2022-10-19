@@ -7,9 +7,11 @@ import { isEqualArray, meanArray, seq } from "./util";
  * Describes the role that each series plays
  */
 export enum DiscreteSeriesMode {
-    /** An individual stochastic realisation */
+    /** An individual stochastic trace */
     Individual = "Individual",
+    /** The mean over several Individual trace */
     Mean = "Mean",
+    /** A single trace for where no variation was observed across all replicates (particles) */
     Deterministic = "Deterministic"
 }
 
