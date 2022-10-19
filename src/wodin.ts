@@ -29,7 +29,10 @@ export interface DiscreteSeriesValues {
 
 /**
  * Interface for objects returned by {@link wodinRunDiscrete}. This
- * represents some number of model variables, each of which may
+ * represents some number of model variables, each of which may have
+ * multiple traces (several stochastic realisations, followed by a
+ * mean) or be a single trace where there was no observed differences
+ * between particles.
  */
 export interface DiscreteSeriesSet {
     /**
