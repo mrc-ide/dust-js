@@ -1,5 +1,5 @@
 import { dustStateTime } from "../src/state-time";
-import { meanArray } from "../src/util";
+import { meanArray, seq } from "../src/util";
 import { tidyDiscreteSolution, tidyDiscreteSolution1, wodinRunDiscrete } from "../src/wodin";
 
 import { rep } from "./helpers";
@@ -8,7 +8,7 @@ import * as models from "./models";
 describe("wodin interface", () => {
     it("can run a model", () => {
         const pars = { n: 1, sd: 3 };
-        const res = wodinRunDiscrete(models.Walk, pars, 0, 10, 3);
+        const res = wodinRunDiscrete(models.Walk, pars, 0, 10, 1, 3);
         expect(res.mode).toStrictEqual([...rep("Individual", 3), "Mean"]);
         expect(res.names).toStrictEqual(rep("x", 4));
         expect(res.x).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -17,7 +17,7 @@ describe("wodin interface", () => {
 
     it("simplifies deterministic traces", () => {
         const pars = { n: 1, sd: 0 };
-        const res = wodinRunDiscrete(models.Walk, pars, 0, 10, 7);
+        const res = wodinRunDiscrete(models.Walk, pars, 0, 10, 1, 7);
         expect(res).toStrictEqual({
             mode: [ "Deterministic" ],
             names: [ "x" ],
@@ -25,27 +25,38 @@ describe("wodin interface", () => {
             y: [ rep(0, 11) ]
         });
     });
+
+    it("rescales time", () => {
+        const pars = { n: 1, sd: 0 };
+        const res = wodinRunDiscrete(models.Walk, pars, 0, 10, 0.1, 7);
+        expect(res).toStrictEqual({
+            mode: [ "Deterministic" ],
+            names: [ "x" ],
+            x: seq(0, 100).map((s) => s * 0.1),
+            y: [ rep(0, 101) ]
+        });
+    });
 });
 
 describe("summarise discrete model output", () => {
     const nState = 3;
     const nParticles = 5;
-    const steps = [0, 1, 2, 3];
-    const state = dustStateTime(nState, nParticles, steps.length);
+    const times = [0, 1, 2, 3];
+    const state = dustStateTime(nState, nParticles, times.length);
     const data = state.state.data as Float64Array;
     const info = [
         { dim: [1], length: 1, name: "x" },
         { dim: [1], length: 1, name: "y" },
         { dim: [1], length: 1, name: "z" }
     ];
-    const solution = { info, state, steps };
+    const solution = { info, state, times };
 
     it("can collapse entirely deterministic output", () => {
         data.fill(0);
         expect(tidyDiscreteSolution(solution)).toStrictEqual({
             mode: rep("Deterministic", 3),
             names: [ "x", "y", "z" ],
-            x: steps,
+            x: times,
             y: rep(rep(0, 4), 3)
         });
     });
@@ -72,7 +83,7 @@ describe("summarise discrete model output", () => {
         expect(res).toEqual({
             mode: ["Deterministic", ...expected.mode, "Deterministic"],
             names: ["x", ...expected.names, "z"],
-            x: steps,
+            x: times,
             y: [rep(0, 4), ...expected.y, rep(0, 4)]
         });
     });

@@ -49,21 +49,25 @@ export interface DiscreteSeriesSet {
     mode: DiscreteSeriesMode[];
 }
 
-export interface DiscreteSolution {
+interface DiscreteSolution {
     info: DustModelInfo;
     state: DustStateTime;
-    steps: number[];
+    times: number[];
 }
 
 export function runModelDiscrete(Model: DustModelConstructable,
-                                 pars: UserType, stepStart: number,
-                                 stepEnd: number,
+                                 pars: UserType, timeStart: number,
+                                 timeEnd: number, dt: number,
                                  nParticles: number): DiscreteSolution {
+    const stepStart = Math.floor(timeStart / dt);
+    const stepEnd = Math.ceil(timeEnd / dt);
     const d = new Dust(Model, pars, nParticles, stepStart);
     const info = d.info();
+
     const steps = seq(stepStart, stepEnd); // inclusive
+    const times = steps.map((s) => s * dt);
     const state = d.simulate(steps, null);
-    return { info, state, steps };
+    return { info, state, times };
 }
 
 /**
@@ -71,26 +75,44 @@ export function runModelDiscrete(Model: DustModelConstructable,
  * we will run some number of replicate simulations forward in time
  * and immediately summarise these in a way that Wodin can use.
  *
+ * There is some sleight of hand here with time that currently copies
+ * the behaviour from the shiny app. The discrete time models don't
+ * really have a concept of time, they just have "steps", and there is
+ * a time variable (`time` in most of the short course/MSc models)
+ * which is defined as `time = step * dt`. So if we know what `dt` is
+ * then we can work directly in terms of "time" in the interface and
+ * obscure steps a bit. So here you need to provide `timeStart`,
+ * `timeEnd` and `dt` from which we can arrange a suitable range of
+ * steps to run the model, then return things in terms of this scaled
+ * time.  For example, if `dt` was 0.1 and you ran the model from time
+ * 0 to 50 we would return 501 points (steps 0, 1, ..., 499, 500)
+ * corresponding to times 0.0, 0.1, 49.9, 50.0. If `dt` is not the
+ * inverse of a natural number this will behave poorly but practically
+ * that's not a big deal because the course organisers bake dt into
+ * the fixed code.
+ *
  * @param Model The model constructor
  *
  * @param pars Parameters to set into the model on construction
  *
- * @param stepStart The starting step (often 0)
+ * @param timeStart The starting step (often 0)
  *
- * @param stepEnd The finishing step
+ * @param timeEnd The finishing step, greater than zero
+ *
+ * @param dt The size of each step
  *
  * @param nParticles The number of independent particles to run
  */
 export function wodinRunDiscrete(Model: DustModelConstructable,
-                                 pars: UserType, stepStart: number,
-                                 stepEnd: number, nParticles: number): DiscreteSeriesSet {
-    const solution = runModelDiscrete(Model, pars, stepStart, stepEnd, nParticles);
+                                 pars: UserType, timeStart: number, timeEnd: number,
+                                 dt: number, nParticles: number): DiscreteSeriesSet {
+    const solution = runModelDiscrete(Model, pars, timeStart, timeEnd, dt, nParticles);
     return tidyDiscreteSolution(solution);
 }
 
 export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeriesSet {
     const names: string[] = [];
-    const x = solution.steps;
+    const x = solution.times;
     const y: number[][] = [];
     const mode: DiscreteSeriesMode[] = [];
 
