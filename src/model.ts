@@ -12,8 +12,13 @@ export { InternalStorage, UserType };
  *
  * @param pars Parameters to pass to the model
  *
+ * @param unusedUserAction String describing the behaviour if unused
+ * values are found in `pars`. Typically this should be the string
+ * "ignore" for dust models but for compatibility with odin (and use
+ * with {@link PkgWrapper}) the values "message", "warning" and "stop"
+ * are supported.
  */
-export type DustModelConstructable = new(base: BaseType, pars: UserType) => DustModel;
+export type DustModelConstructable = new(base: BaseType, pars: UserType, unusedUserAction: string) => DustModel;
 
 /**
  * Information returned by an initialised model about itself
@@ -83,4 +88,10 @@ export interface DustModel {
      * @param random The random state, used for any stochastic updates
      */
     update(step: number, y: readonly number[], yNext: number[], random: Random): void;
+
+    /**
+     * Return the state of the internal storage - odin uses this for
+     * debugging and testing.
+     */
+    getInternal(): InternalStorage;
 }

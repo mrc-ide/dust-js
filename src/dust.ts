@@ -49,7 +49,7 @@ export class Dust {
         // workers we might need to revisit this approach, but the API
         // there looks nothing like OpenMP and this would probably
         // still be ok, once per worker.
-        const model = new Model(base, pars);
+        const model = new Model(base, pars, "ignore");
         for (let i = 0; i < nParticles; ++i) {
             this._particles.push(new Particle(model, step));
         }
@@ -97,7 +97,7 @@ export class Dust {
     public setPars(pars: UserType, setInitialState: boolean): void {
         const step = this.step();
         const nState = this.nState();
-        const model = new this._Model(base, pars);
+        const model = new this._Model(base, pars, "ignore");
         if (model.size() !== this.nState()) {
             throw Error(`Particle produced unexpected state size`);
         }
@@ -121,7 +121,7 @@ export class Dust {
     /**
      * Change the model state
      *
-     * @param state A 2d-matrix of state; this inteface may change.
+     * @param state A 2d-matrix of state; this interface may change.
      */
     public setState(state: number[][]): void {
         this.checkState(state);
