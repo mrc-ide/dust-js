@@ -168,7 +168,7 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
     } else {
         return [{
             mode: DiscreteSeriesMode.Deterministic,
-            name: name,
+            name,
             y: first
         }]
     }
