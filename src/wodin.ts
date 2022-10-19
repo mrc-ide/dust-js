@@ -16,37 +16,39 @@ export enum DiscreteSeriesMode {
 }
 
 /**
+ * A single series, most likely within a {@link DiscreteSeriesSet}
+ */
+export interface DiscreteSeriesValues {
+    /** The mode that the series plays */
+    mode: DiscreteSeriesMode;
+    /** The name of the series */
+    name: string;
+    /** The values of the variable within the series */
+    y: number[];
+}
+
+/**
  * Interface for objects returned by {@link wodinRunDiscrete}. This
  * represents some number of model variables, each of which may
  */
 export interface DiscreteSeriesSet {
-    /** Names of each trace represented in `y`; these will be repeated
-     * wherever stochastic traces are found
-     */
-    names: string[];
     /**
      * Common domain (typically time) for the solution
      */
     x: number[];
     /**
-     * An array of arrays of variables - the element `y[i][j]`
-     * represents the `i`th trace at the `j` time; there `y.length`
-     * will be the same as `names.length` and `mode.length` (i.e., one
-     * trace per series), and `y[i].length` will be the same as
-     * `x.length` (i.e., each series as one point per step)
-     */
-    y: number[][];
-    /**
-     * The mode that each trace plays. These have some predictable
-     * behaviours:
+     * The individual seriess. These have predictable ordering:
      *
+     * * Traces corresponding to a single logical model variable will
+     *   be adjacent to each other, and these will be in the same
+     *   order as the model metadata.
      * * `Individual` traces will always appear before the single
      *   `Mean` trace
      * * For a given value in `names`, there will either be at least
      *   one `Individual` trace, followed by exactly one `Mean` trace
      *   or there will be a single `Deterministic` trace
      */
-    mode: DiscreteSeriesMode[];
+    values: DiscreteSeriesValues[];
 }
 
 interface DiscreteSolution {
@@ -116,17 +118,16 @@ export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeries
     const y: number[][] = [];
     const mode: DiscreteSeriesMode[] = [];
 
+    const values = [] as DiscreteSeriesValues[];
     solution.info.forEach((el) => {
-        const sol = tidydiscretesolutionVariable(el.name, solution);
-        names.push(...sol.names);
-        y.push(...sol.y);
-        mode.push(...sol.mode);
+        const sol = tidyDiscreteSolutionVariable(el.name, solution);
+        values.push(...sol);
     });
 
-    return { mode, names, x, y };
+    return { x, values };
 }
 
-export function tidydiscretesolutionVariable(name: string, solution: DiscreteSolution) {
+export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSolution): DiscreteSeriesValues[] {
     // TODO: if we have any array variables, this is going to need
     // some work, but that's the case all through the package and
     // currently prevented by mrc-3468.
@@ -153,16 +154,22 @@ export function tidydiscretesolutionVariable(name: string, solution: DiscreteSol
     }
 
     if (isStochastic) {
-        const mode = Array(y.length).fill(DiscreteSeriesMode.Individual);
-        y.push(meanArray(y));
-        mode.push(DiscreteSeriesMode.Mean);
-        const names = Array(y.length).fill(name);
-        return { mode, names, y };
+        const values = y.map((s) => ({
+            mode: DiscreteSeriesMode.Individual,
+            name,
+            y: s
+        }));
+        values.push({
+            mode: DiscreteSeriesMode.Mean,
+            name,
+            y: meanArray(y)
+        });
+        return values;
     } else {
-        return {
-            mode: [DiscreteSeriesMode.Deterministic],
-            names: [name],
-            y: [first]
-        }
+        return [{
+            mode: DiscreteSeriesMode.Deterministic,
+            name: name,
+            y: first
+        }]
     }
 }
