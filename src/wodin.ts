@@ -101,7 +101,7 @@ export function runModelDiscrete(Model: DustModelConstructable,
  *
  * @param dt The size of each step
  *
- * @param nParticles The number of independent particles to run
+ * @param nParticles The number of independent particles (replicates) to run
  */
 export function wodinRunDiscrete(Model: DustModelConstructable,
                                  pars: UserType, timeStart: number, timeEnd: number,
@@ -117,7 +117,7 @@ export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeries
     const mode: DiscreteSeriesMode[] = [];
 
     solution.info.forEach((el) => {
-        const sol = tidyDiscreteSolution1(el.name, solution);
+        const sol = tidydiscretesolutionVariable(el.name, solution);
         names.push(...sol.names);
         y.push(...sol.y);
         mode.push(...sol.mode);
@@ -126,7 +126,7 @@ export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeries
     return { mode, names, x, y };
 }
 
-export function tidyDiscreteSolution1(name: string, solution: DiscreteSolution) {
+export function tidydiscretesolutionVariable(name: string, solution: DiscreteSolution) {
     // TODO: if we have any array variables, this is going to need
     // some work, but that's the case all through the package and
     // currently prevented by mrc-3468.
