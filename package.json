@@ -4,7 +4,9 @@
     "description": "Dust-like interface for js",
     "main": "index.js",
     "scripts": {
+        "prebuild": "node scripts/versions.js",
         "build": "tsc",
+        "prewebpack": "node scripts/versions.js",
         "webpack": "webpack",
         "test": "jest -c jest.config.js",
         "lint": "tslint -c tslint.json 'src/*.ts' 'tests/*.ts'",
