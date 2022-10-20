@@ -1,4 +1,4 @@
-import { Random, RngState } from "@reside-ic/random";
+import { Random, RngState, RngStateBuiltin } from "@reside-ic/random";
 
 import { base } from "./base";
 import type {
@@ -32,13 +32,13 @@ export class Dust {
      * @param random The random state
      */
     constructor(Model: DustModelConstructable, pars: UserType, nParticles: number,
-                step: number, random: Random) {
+                step: number, random?: Random) {
         if (nParticles <= 0) {
             throw Error("Expected at least one particle");
         }
         this._Model = Model;
         this._particles = [];
-        this._random = random;
+        this._random = random ? random : new Random(new RngStateBuiltin());
 
         // NOTE: Here, we construct the model just once per dust
         // object and then use exactly the same model object

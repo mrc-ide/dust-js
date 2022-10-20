@@ -23,3 +23,21 @@ export function combinations(arr: number[]): number[][] {
         return n.map((el: number) => [el]);
     }
 }
+
+export function isEqualArray(a: number[], b: number[]): boolean {
+    return a.every((val, idx) => val === b[idx])
+}
+
+
+export function applyArray(y: number[][], fn: (yi: number[]) => number): number[] {
+    return y[0].map(
+        (_: any, i: number) => fn(y.map((row: number[]) => row[i])));
+}
+
+export function mean(x: number[]): number {
+    return x.reduce((a, b) => a + b, 0) / x.length;
+}
+
+export function meanArray(y: number[][]) {
+    return applyArray(y, mean);
+}
