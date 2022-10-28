@@ -3,7 +3,13 @@ import { Times, TimeMode } from "@reside-ic/odinjs";
 import { Dust } from "./dust";
 import type { DustModel, DustModelInfo, DustModelConstructable, UserType } from "./model";
 import type { DustStateTime } from "./state-time";
-import { isEqualArray, meanArray, seq, seqBy } from "./util";
+import {
+    findClosest,
+    isEqualArray,
+    meanArray,
+    seq,
+    seqBy
+} from "./util";
 
 /**
  * Describes the role that each series plays
@@ -136,12 +142,12 @@ export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeries
 
 export function filterIndex(t: number[], times: Times): number[] {
     if (times.mode == TimeMode.Grid) {
-        const i0 = t.findIndex((el: number) => el >= times.tStart);
-        const i1 = t.findIndex((el: number) => el <= times.tEnd);
-        const by = Math.min(1, Math.ceil(times.nPoints / (i1 - i0)));
+        const i0 = findClosest(times.tStart, t);
+        const i1 = findClosest(times.tEnd, t);
+        const by = Math.max(1, Math.ceil((i1 - i0) / times.nPoints));
         return seqBy(i0, i1, by);
     } else {
-        throw Error("not yet supported");
+        return times.times.map((el) => findClosest(el, t));
     }
 }
 
@@ -201,10 +207,4 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
             y: first
         }]
     }
-}
-
-export function makeFilter(i0: number, i1: number, n: number) {
-    const by = Math.min(1, Math.ceil(n / (i1 - i0)));
-    const index = seqBy(i0, i1, by);
-    return (x: number[]) => index.map((i) => x[i]);
 }
