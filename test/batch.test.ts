@@ -37,4 +37,45 @@ describe("can run batch", () => {
         expect(max.values[0].y).toStrictEqual(
             res.solutions.map((el) => Math.max(...el.values[0].y)));
     });
+
+    it("can report on near miss values", () => {
+        const tEnd = 10;
+        const dt = 0.1;
+        const nParticles = 7;
+        const pars = {
+            base: {n: 1, sd: 0},
+            name: "sd",
+            values: [0, 1, 10, 100]
+        };
+        const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
+        const end = res.valueAtTime(9 + 1e-4);
+        expect(end.values[0].y).toStrictEqual(res.solutions.map((el) => el.values[0].y[90]));
+    });
+
+    it("can return a partial set of results on error", () => {
+        const tEnd = 10;
+        const dt = 0.1;
+        const nParticles = 7;
+        const pars = {
+            base: {n: 1, sd: 0},
+            name: "sd",
+            values: [-2, -1, 0, 1, 2]
+        };
+        const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
+        expect(res.pars.values).toStrictEqual([0, 1, 2]);
+        expect(res.solutions.length).toBe(3);
+    });
+
+    it("can throw if all solutions fail", () => {
+        const tEnd = 10;
+        const dt = 0.1;
+        const nParticles = 7;
+        const pars = {
+            base: {n: 1, sd: 0},
+            name: "sd",
+            values: [-3, -2, -1]
+        };
+        expect(() => batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles))
+            .toThrow("All solutions failed; first error: Expected 'sd' to be at least 0");
+    });
 });

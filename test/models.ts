@@ -16,7 +16,7 @@ export class Walk implements DustModel {
         base.user.setUserScalar(pars, "n", this.internal, 1,
                                 -Infinity, Infinity, false);
         base.user.setUserScalar(pars, "sd", this.internal, 1,
-                                -Infinity, Infinity, false);
+                                0, Infinity, false);
     }
 
     public size(): number {
