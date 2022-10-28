@@ -6,6 +6,14 @@ export function seq(a: number, b: number): number[] {
     return ret;
 }
 
+export function seqBy(a: number, b: number, by: number) {
+    const ret = [];
+    for (let i = a; i <= b; i += by) {
+        ret.push(i);
+    }
+    return ret;
+}
+
 export function combinations(arr: number[]): number[][] {
     const ret: number[][] = [];
     const n = seq(1, arr[0]);

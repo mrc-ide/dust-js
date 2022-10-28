@@ -1,7 +1,9 @@
+import { Times, TimeMode } from "@reside-ic/odinjs";
+
 import { Dust } from "./dust";
 import type { DustModel, DustModelInfo, DustModelConstructable, UserType } from "./model";
 import type { DustStateTime } from "./state-time";
-import { isEqualArray, meanArray, seq } from "./util";
+import { isEqualArray, meanArray, seq, seqBy } from "./util";
 
 /**
  * Describes the role that each series plays
@@ -60,6 +62,8 @@ interface DiscreteSolution {
     times: number[];
 }
 
+export type FilteredDiscreteSolution = (times: Times) => DiscreteSeriesSet;
+
 export function runModelDiscrete(Model: DustModelConstructable,
                                  pars: UserType, timeStart: number,
                                  timeEnd: number, dt: number,
@@ -110,9 +114,9 @@ export function runModelDiscrete(Model: DustModelConstructable,
  */
 export function wodinRunDiscrete(Model: DustModelConstructable,
                                  pars: UserType, timeStart: number, timeEnd: number,
-                                 dt: number, nParticles: number): DiscreteSeriesSet {
+                                 dt: number, nParticles: number): FilteredDiscreteSolution {
     const solution = runModelDiscrete(Model, pars, timeStart, timeEnd, dt, nParticles);
-    return tidyDiscreteSolution(solution);
+    return filterSolution(tidyDiscreteSolution(solution));
 }
 
 export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeriesSet {
@@ -128,6 +132,28 @@ export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeries
     });
 
     return { x, values };
+}
+
+export function filterIndex(t: number[], times: Times): number[] {
+    if (times.mode == TimeMode.Grid) {
+        const i0 = t.findIndex((el: number) => el >= times.tStart);
+        const i1 = t.findIndex((el: number) => el <= times.tEnd);
+        const by = Math.min(1, Math.ceil(times.nPoints / (i1 - i0)));
+        return seqBy(i0, i1, by);
+    } else {
+        throw Error("not yet supported");
+    }
+}
+
+export function filterSolution(solution: DiscreteSeriesSet): FilteredDiscreteSolution {
+    return (times: Times) => {
+        const index = filterIndex(solution.x, times);
+        const filter = (x: number[]) => index.map((i) => x[i]);
+        return {
+            x: filter(solution.x),
+            values: solution.values.map((el) => ({ ...el, y: filter(el.y) })),
+        };
+    }
 }
 
 export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSolution): DiscreteSeriesValues[] {
@@ -175,4 +201,10 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
             y: first
         }]
     }
+}
+
+export function makeFilter(i0: number, i1: number, n: number) {
+    const by = Math.min(1, Math.ceil(n / (i1 - i0)));
+    const index = seqBy(i0, i1, by);
+    return (x: number[]) => index.map((i) => x[i]);
 }
