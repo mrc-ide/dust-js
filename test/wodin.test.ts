@@ -1,14 +1,29 @@
+import { Times, TimeMode } from "@reside-ic/odinjs";
+
 import { dustStateTime } from "../src/state-time";
-import { meanArray, seq } from "../src/util";
-import { tidyDiscreteSolution, tidyDiscreteSolutionVariable, wodinRunDiscrete } from "../src/wodin";
+import { meanArray, seq, seqBy } from "../src/util";
+import {
+    filterIndex,
+    tidyDiscreteSolution,
+    tidyDiscreteSolutionVariable,
+    wodinRunDiscrete
+} from "../src/wodin";
 
 import { rep } from "./helpers";
 import * as models from "./models";
 
 describe("wodin interface", () => {
+    const allTimes = {
+        mode: TimeMode.Grid as const,
+        tStart: 0,
+        tEnd: 10,
+        nPoints: Infinity
+    };
+
     it("can run a model", () => {
         const pars = { n: 1, sd: 3 };
-        const res = wodinRunDiscrete(models.Walk, pars, 0, 10, 1, 3);
+        const sol = wodinRunDiscrete(models.Walk, pars, 0, 10, 1, 3);
+        const res = sol(allTimes);
         expect(res.x).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         expect(res.values.map((s) => s.mode))
             .toStrictEqual([...rep("Individual", 3), "Mean"]);
@@ -20,8 +35,8 @@ describe("wodin interface", () => {
 
     it("simplifies deterministic traces", () => {
         const pars = { n: 1, sd: 0 };
-        const res = wodinRunDiscrete(models.Walk, pars, 0, 10, 1, 7);
-        expect(res).toStrictEqual({
+        const sol = wodinRunDiscrete(models.Walk, pars, 0, 10, 1, 7);
+        expect(sol(allTimes)).toStrictEqual({
             x: seq(0, 10),
             values: [{ mode: "Deterministic", name: "x", y: rep(0, 11) }]
         });
@@ -29,8 +44,8 @@ describe("wodin interface", () => {
 
     it("rescales time", () => {
         const pars = { n: 1, sd: 0 };
-        const res = wodinRunDiscrete(models.Walk, pars, 0, 10, 0.1, 7);
-        expect(res).toStrictEqual({
+        const sol = wodinRunDiscrete(models.Walk, pars, 0, 10, 0.1, 7);
+        expect(sol(allTimes)).toStrictEqual({
             x: seq(0, 100).map((s) => s * 0.1),
             values: [{ mode: "Deterministic", name: "x", y: rep(0, 101) }]
         });
@@ -83,5 +98,37 @@ describe("summarise discrete model output", () => {
             x: times,
             values: [x, ...expected, z]
         });
+    });
+});
+
+describe("can filter", () => {
+    const t = seq(0, 100).map((x) => x * 0.1);
+    it("filters based on grid, aligning well", () => {
+        const times = {
+            mode: TimeMode.Grid as const,
+            tStart: 0,
+            tEnd: 10,
+            nPoints: 11,
+        };
+
+        expect(filterIndex(t, times)).toStrictEqual(seqBy(0, 100, 10));
+    });
+
+    it("filters a subset aligning inexactly", () => {
+        const times = {
+            mode: TimeMode.Grid as const,
+            tStart: 3.141,
+            tEnd: 6.7314,
+            nPoints: 20,
+        };
+        expect(filterIndex(t, times)).toStrictEqual(seqBy(31, 67, 2));
+    });
+
+    it("filters for specific points", () => {
+        const times = {
+            mode: TimeMode.Given as const,
+            times: [3.141, 7.7713]
+        };
+        expect(filterIndex(t, times)).toStrictEqual([31, 78]);
     });
 });

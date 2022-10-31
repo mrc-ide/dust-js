@@ -6,6 +6,14 @@ export function seq(a: number, b: number): number[] {
     return ret;
 }
 
+export function seqBy(a: number, b: number, by: number) {
+    const ret = [];
+    for (let i = a; i <= b; i += by) {
+        ret.push(i);
+    }
+    return ret;
+}
+
 export function combinations(arr: number[]): number[][] {
     const ret: number[][] = [];
     const n = seq(1, arr[0]);
@@ -40,4 +48,16 @@ export function mean(x: number[]): number {
 
 export function meanArray(y: number[][]) {
     return applyArray(y, mean);
+}
+
+export function findClosest(x: number, arr: number[]) {
+    // Using binary search here would be nicer; we'll always have 'x'
+    // sorted, and will do this fairly often.
+    const i = arr.findIndex((el) => el >= x);
+    if (arr[i] === x || i === 0) {
+        return i;
+    }
+    const xi = arr[i - 1];
+    const xj = arr[i];
+    return (x - xi) < (xj - x) ? i - 1 : i;
 }
