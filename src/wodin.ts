@@ -141,7 +141,7 @@ export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeries
 }
 
 export function filterIndex(t: number[], times: Times): number[] {
-    if (times.mode == TimeMode.Grid) {
+    if (times.mode === TimeMode.Grid) {
         const i0 = findClosest(times.tStart, t);
         const i1 = findClosest(times.tEnd, t);
         const by = Math.max(1, Math.ceil((i1 - i0) / times.nPoints));
