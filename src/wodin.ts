@@ -1,4 +1,11 @@
-import { Times, TimeMode } from "@reside-ic/odinjs";
+import {
+    Batch,
+    BatchPars,
+    InterpolatedSolution,
+    SeriesSet,
+    Times,
+    TimeMode
+} from "@reside-ic/odinjs";
 
 import { Dust } from "./dust";
 import type { DustModel, DustModelInfo, DustModelConstructable, UserType } from "./model";
@@ -207,4 +214,26 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
             y: first
         }]
     }
+}
+
+export function batchRunDiscrete(Model: DustModelConstructable, pars: BatchPars,
+                                 timeStart: number, timeEnd: number,
+                                 dt: number, nParticles: number): Batch {
+    const run = (p: UserType, t0: number, t1: number) =>
+        centralOnly(wodinRunDiscrete(Model, p, t0, t1, dt, nParticles));
+    return new Batch(run, pars, timeStart, timeEnd);
+}
+
+export function centralOnly(solution: FilteredDiscreteSolution): InterpolatedSolution {
+    return (times: Times) => filterToCentralOnly(solution(times));
+}
+
+export function filterToCentralOnly(result: DiscreteSeriesSet): SeriesSet {
+    const values = result.values
+        .filter((el: DiscreteSeriesValues) => el.mode !== DiscreteSeriesMode.Individual)
+        .map((el: DiscreteSeriesValues) => ({ name: el.name, y: el.y }));
+    return {
+        x: result.x,
+        values
+    };
 }
