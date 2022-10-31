@@ -12,8 +12,10 @@ export { dustState, DustState, VectorView } from "./state";
 export { dustStateTime, DustStateTime } from "./state-time";
 export { versions } from "./versions";
 export {
+    batchRunDiscrete,
     DiscreteSeriesMode,
     DiscreteSeriesSet,
     DiscreteSeriesValues,
+    FilteredDiscreteSolution,
     wodinRunDiscrete
 } from "./wodin";
