@@ -1,4 +1,11 @@
-import { Times, TimeMode } from "@reside-ic/odinjs";
+import {
+    Batch,
+    BatchPars,
+    InterpolatedSolution,
+    SeriesSet,
+    Times,
+    TimeMode
+} from "@reside-ic/odinjs";
 
 import { Dust } from "./dust";
 import type { DustModel, DustModelInfo, DustModelConstructable, UserType } from "./model";
@@ -68,6 +75,11 @@ interface DiscreteSolution {
     times: number[];
 }
 
+/**
+ * The discrete-time version of odin-js's `InterpolatedSolution`; the
+ * solution is not interpolated here, but we filter times based on the
+ * requested times and the times available from the simulation.
+ */
 export type FilteredDiscreteSolution = (times: Times) => DiscreteSeriesSet;
 
 export function runModelDiscrete(Model: DustModelConstructable,
@@ -207,4 +219,44 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
             y: first
         }]
     }
+}
+
+/**
+ * Run a series of runs of a discrete-time model, returning a set of
+ * solutions.
+ *
+ * @param Model The model constructor
+ *
+ * @param pars Parameters of the model, and information about the one
+ * to vary. Most easily generated with odin-js's `batchParsRange` or
+ * `batchParsDisplace`
+ *
+ * @param timeStart Start of the simulation (often 0)
+ *
+ * @param timeEnd End of the simulation (must be greater than `timeStart`)
+ *
+ * @param dt The size of each step
+ *
+ * @param nParticles The number of independent particles (replicates) to run
+ */
+export function batchRunDiscrete(Model: DustModelConstructable, pars: BatchPars,
+                                 timeStart: number, timeEnd: number,
+                                 dt: number, nParticles: number): Batch {
+    const run = (p: UserType, t0: number, t1: number) =>
+        centralOnly(wodinRunDiscrete(Model, p, t0, t1, dt, nParticles));
+    return new Batch(run, pars, timeStart, timeEnd);
+}
+
+export function centralOnly(solution: FilteredDiscreteSolution): InterpolatedSolution {
+    return (times: Times) => filterToCentralOnly(solution(times));
+}
+
+export function filterToCentralOnly(result: DiscreteSeriesSet): SeriesSet {
+    const values = result.values
+        .filter((el: DiscreteSeriesValues) => el.mode !== DiscreteSeriesMode.Individual)
+        .map((el: DiscreteSeriesValues) => ({ name: el.name, y: el.y }));
+    return {
+        x: result.x,
+        values
+    };
 }
