@@ -51,13 +51,41 @@ export function meanArray(y: number[][]) {
 }
 
 export function findClosest(x: number, arr: number[]) {
-    // Using binary search here would be nicer; we'll always have 'x'
-    // sorted, and will do this fairly often.
-    const i = arr.findIndex((el) => el >= x);
+    const i = search(arr, (el) => el >= x);
     if (arr[i] === x || i === 0) {
         return i;
     }
-    const xi = arr[i - 1];
-    const xj = arr[i];
-    return (x - xi) < (xj - x) ? i - 1 : i;
+    if (i === arr.length) {
+        return arr.length - 1;
+    }
+    return (x - arr[i - 1]) < (arr[i] - x) ? i - 1 : i;
+}
+
+export function search(x: number[], pred: (el: number) => boolean) {
+    // Aim is to find the first element that is `true` for this
+    // condition; as 'x' is assumed to be sorted this will hold for
+    // all subsequent elements.
+    const n = x.length;
+    let left = 0;
+    let right = n - 1;
+    if (!pred(x[right])) {
+        return n;
+    }
+    if (pred(x[left])) {
+        return 0;
+    }
+    // At this point we have
+    //      0  1  2     n-2   n-1
+    // [false, ?, ?, ..., ?, true]
+    //   left                right
+    while (right - left > 1) {
+        const m = Math.floor((left + right) / 2);
+        if (pred(x[m])) {
+            right = m;
+        } else {
+            left = m;
+        }
+    }
+
+    return right;
 }
