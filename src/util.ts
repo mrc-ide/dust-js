@@ -62,7 +62,9 @@ export function findClosest(x: number, arr: number[]) {
 }
 
 export function search(x: number[], pred: (el: number) => boolean) {
-    // Aim is to find the first element that is `true` for this condition.
+    // Aim is to find the first element that is `true` for this
+    // condition; as 'x' is assumed to be sorted this will hold for
+    // all subsequent elements.
     const n = x.length;
     let left = 0;
     let right = n - 1;
