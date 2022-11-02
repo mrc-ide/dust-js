@@ -178,6 +178,9 @@ describe("can run batch", () => {
     });
 
     it("can report on near miss values", () => {
+        // Unlike odin, if the user asks for a specific time it might
+        // not be present due to floating point differences; check
+        // that if they're close to a time we get the right time back.
         const tEnd = 10;
         const dt = 0.1;
         const nParticles = 7;
