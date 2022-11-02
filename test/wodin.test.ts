@@ -151,6 +151,7 @@ describe("can run batch", () => {
             values: [0, 1, 10, 100]
         };
         const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
+        res.run();
         expect(res.solutions.length).toBe(4);
         expect(res.errors).toStrictEqual([]);
         const traces0 = res.solutions[0](allTimes);
@@ -186,6 +187,7 @@ describe("can run batch", () => {
             values: [0, 1, 10, 100]
         };
         const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
+        res.run();
         const end = res.valueAtTime(9 + 1e-4);
         expect(end.values[0].y).toStrictEqual(
             res.solutions.map((el) => el(allTimes).values[0].y[90]));
@@ -201,6 +203,7 @@ describe("can run batch", () => {
             values: [-2, -1, 0, 1, 2]
         };
         const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
+        res.run();
         expect(res.pars.values).toStrictEqual([0, 1, 2]);
         expect(res.solutions.length).toBe(3);
     });
@@ -214,7 +217,8 @@ describe("can run batch", () => {
             name: "sd",
             values: [-3, -2, -1]
         };
-        expect(() => batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles))
+        const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
+        expect(() => res.run())
             .toThrow("All solutions failed; first error: Expected 'sd' to be at least 0");
     });
 });
