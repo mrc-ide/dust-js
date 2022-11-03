@@ -1,7 +1,7 @@
 import { Times, TimeMode } from "@reside-ic/odinjs";
 
 import { dustStateTime } from "../src/state-time";
-import { mean, meanArray, seq, seqBy } from "../src/util";
+import { applyArray, mean, meanArray, seq, seqBy } from "../src/util";
 import {
     batchRunDiscrete,
     filterIndex,
@@ -32,6 +32,28 @@ describe("wodin interface", () => {
             .toStrictEqual(rep("x", 4));
         const y = res.values.map((s) => s.y);
         expect(meanArray(y.slice(0, 3))).toStrictEqual(y[3]);
+    });
+
+    it("can customise the summary", () => {
+        const pars = { n: 1, sd: 3 };
+        const min = (x: number[]) => Math.min(...x);
+        const max = (x: number[]) => Math.max(...x);
+        const summary = [
+            { description: "Min", summary: min },
+            { description: "Mean", summary: mean },
+            { description: "Max", summary: max }
+        ];
+        const sol = wodinRunDiscrete(models.Walk, pars, 0, 10, 1, 13, summary);
+        const res = sol(allTimes);
+        expect(res.x).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        expect(res.values.map((s) => s.description))
+            .toStrictEqual([...rep("Individual", 13), "Min", "Mean", "Max"]);
+        expect(res.values.map((s) => s.name))
+            .toStrictEqual(rep("x", 13 + 3));
+        const y = res.values.map((s) => s.y);
+        expect(applyArray(y.slice(0, 13), min)).toStrictEqual(y[13]);
+        expect(meanArray(y.slice(0, 13))).toStrictEqual(y[14]);
+        expect(applyArray(y.slice(0, 13), max)).toStrictEqual(y[15]);
     });
 
     it("simplifies deterministic traces", () => {
