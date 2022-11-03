@@ -11,31 +11,29 @@ import { Dust } from "./dust";
 import type { DustModel, DustModelInfo, DustModelConstructable, UserType } from "./model";
 import type { DustStateTime } from "./state-time";
 import {
+    applyArray,
     findClosest,
     isEqualArray,
-    meanArray,
+    mean,
     seq,
     seqBy
 } from "./util";
 
 /**
- * Describes the role that each series plays
- */
-export enum DiscreteSeriesMode {
-    /** An individual stochastic trace */
-    Individual = "Individual",
-    /** The mean over several Individual trace */
-    Mean = "Mean",
-    /** A single trace for where no variation was observed across all replicates (particles) */
-    Deterministic = "Deterministic"
-}
-
-/**
  * A single series, most likely within a {@link DiscreteSeriesSet}
  */
 export interface DiscreteSeriesValues {
-    /** The mode that the series plays */
-    mode: DiscreteSeriesMode;
+    /**
+     * The description of the series. There are a couple of special values:
+     *
+     * * Individual: an individual stochastic trace
+     * * Deterministic: A single trace for where no variation was
+     *   observed across all replicates (particles)
+     *
+     * Otherwise, the description is derived from the summary
+     * function.
+     */
+    description: string;
     /** The name of the series */
     name: string;
     /** The values of the variable within the series */
@@ -60,11 +58,10 @@ export interface DiscreteSeriesSet {
      * * Traces corresponding to a single logical model variable will
      *   be adjacent to each other, and these will be in the same
      *   order as the model metadata.
-     * * `Individual` traces will always appear before the single
-     *   `Mean` trace
-     * * For a given value in `names`, there will either be at least
-     *   one `Individual` trace, followed by exactly one `Mean` trace
-     *   or there will be a single `Deterministic` trace
+     * * Individual traces (which have a `description` value of
+     *   `"Individual"` will always appear before any summary traces,
+     *   but are omitted in the case where all individual traces are
+     *   identical.
      */
     values: DiscreteSeriesValues[];
 }
@@ -141,7 +138,6 @@ export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeries
     const names: string[] = [];
     const x = solution.times;
     const y: number[][] = [];
-    const mode: DiscreteSeriesMode[] = [];
 
     const values = [] as DiscreteSeriesValues[];
     solution.info.forEach((el) => {
@@ -190,6 +186,10 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
     const state = solution.state;
     const first = state.getTrace(i, 0);
 
+    const summary = [
+        { description: "Mean", summary: mean }
+    ];
+
     let isStochastic = false;
     const y: number[][] = [];
     for (let j = 0; j < state.nParticles; ++j) {
@@ -202,19 +202,21 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
 
     if (isStochastic) {
         const values = y.map((s) => ({
-            mode: DiscreteSeriesMode.Individual,
+            description: "Individual",
             name,
             y: s
         }));
-        values.push({
-            mode: DiscreteSeriesMode.Mean,
-            name,
-            y: meanArray(y)
+        summary.map((el) => {
+            values.push({
+                description: el.description,
+                name,
+                y: applyArray(y, el.summary)
+            });
         });
         return values;
     } else {
         return [{
-            mode: DiscreteSeriesMode.Deterministic,
+            description: "Deterministic",
             name,
             y: first
         }]
@@ -253,7 +255,7 @@ export function centralOnly(solution: FilteredDiscreteSolution): InterpolatedSol
 
 export function filterToCentralOnly(result: DiscreteSeriesSet): SeriesSet {
     const values = result.values
-        .filter((el: DiscreteSeriesValues) => el.mode !== DiscreteSeriesMode.Individual)
+        .filter((el: DiscreteSeriesValues) => el.description !== "Individual")
         .map((el: DiscreteSeriesValues) => ({ name: el.name, y: el.y }));
     return {
         x: result.x,

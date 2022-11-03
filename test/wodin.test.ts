@@ -26,7 +26,7 @@ describe("wodin interface", () => {
         const sol = wodinRunDiscrete(models.Walk, pars, 0, 10, 1, 3);
         const res = sol(allTimes);
         expect(res.x).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        expect(res.values.map((s) => s.mode))
+        expect(res.values.map((s) => s.description))
             .toStrictEqual([...rep("Individual", 3), "Mean"]);
         expect(res.values.map((s) => s.name))
             .toStrictEqual(rep("x", 4));
@@ -39,7 +39,7 @@ describe("wodin interface", () => {
         const sol = wodinRunDiscrete(models.Walk, pars, 0, 10, 1, 7);
         expect(sol(allTimes)).toStrictEqual({
             x: seq(0, 10),
-            values: [{ mode: "Deterministic", name: "x", y: rep(0, 11) }]
+            values: [{ description: "Deterministic", name: "x", y: rep(0, 11) }]
         });
     });
 
@@ -48,7 +48,7 @@ describe("wodin interface", () => {
         const sol = wodinRunDiscrete(models.Walk, pars, 0, 10, 0.1, 7);
         expect(sol(allTimes)).toStrictEqual({
             x: seq(0, 100).map((s) => s * 0.1),
-            values: [{ mode: "Deterministic", name: "x", y: rep(0, 101) }]
+            values: [{ description: "Deterministic", name: "x", y: rep(0, 101) }]
         });
     });
 });
@@ -71,9 +71,9 @@ describe("summarise discrete model output", () => {
         expect(tidyDiscreteSolution(solution)).toStrictEqual({
             x: times,
             values: [
-                { mode: "Deterministic", name: "x", y: rep(0, 4) },
-                { mode: "Deterministic", name: "y", y: rep(0, 4) },
-                { mode: "Deterministic", name: "z", y: rep(0, 4) },
+                { description: "Deterministic", name: "x", y: rep(0, 4) },
+                { description: "Deterministic", name: "y", y: rep(0, 4) },
+                { description: "Deterministic", name: "z", y: rep(0, 4) },
             ]
         });
     });
@@ -84,14 +84,14 @@ describe("summarise discrete model output", () => {
         trace.set(2, 1);
         const res1 = tidyDiscreteSolutionVariable("y", solution);
         const y1 = {
-            mode: "Individual",
+            description: "Individual",
             name: "y",
             y: rep(0, 4)
         };
         const y2 = { ...y1, y: [0, 0, 1, 0] };
-        const y3 = { ...y1, y: [0, 0, 0.2, 0], mode: "Mean" };
-        const x = { mode: "Deterministic", name: "x", y: rep(0, 4) };
-        const z = { mode: "Deterministic", name: "z", y: rep(0, 4) };
+        const y3 = { ...y1, y: [0, 0, 0.2, 0], description: "Mean" };
+        const x = { description: "Deterministic", name: "x", y: rep(0, 4) };
+        const z = { description: "Deterministic", name: "z", y: rep(0, 4) };
         const expected = [y1, y1, y2, y1, y1, y3];
         expect(res1).toStrictEqual(expected);
         const res = tidyDiscreteSolution(solution);
