@@ -20,6 +20,17 @@ import {
 } from "./util";
 
 /**
+ * Convert a slice of a series at a single time point into a single
+ * summary value
+ */
+export interface SummaryRule {
+    /** Description of this summary, should use an initial capital */
+    description: string;
+    /** The actual transformation function */
+    summary: (x: number[]) => number;
+}
+
+/**
  * A single series, most likely within a {@link DiscreteSeriesSet}
  */
 export interface DiscreteSeriesValues {
@@ -129,19 +140,22 @@ export function runModelDiscrete(Model: DustModelConstructable,
  */
 export function wodinRunDiscrete(Model: DustModelConstructable,
                                  pars: UserType, timeStart: number, timeEnd: number,
-                                 dt: number, nParticles: number): FilteredDiscreteSolution {
+                                 dt: number, nParticles: number,
+                                 summary?: SummaryRule[]): FilteredDiscreteSolution {
+    if (!summary) {
+        summary = [{ description: "Mean", summary: mean }];
+    }
     const solution = runModelDiscrete(Model, pars, timeStart, timeEnd, dt, nParticles);
-    return filterSolution(tidyDiscreteSolution(solution));
+    return filterSolution(tidyDiscreteSolution(solution, summary));
 }
 
-export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeriesSet {
+export function tidyDiscreteSolution(solution: DiscreteSolution, summary: SummaryRule[]): DiscreteSeriesSet {
     const names: string[] = [];
     const x = solution.times;
     const y: number[][] = [];
-
     const values = [] as DiscreteSeriesValues[];
     solution.info.forEach((el) => {
-        const sol = tidyDiscreteSolutionVariable(el.name, solution);
+        const sol = tidyDiscreteSolutionVariable(el.name, solution, summary);
         values.push(...sol);
     });
 
@@ -170,7 +184,8 @@ export function filterSolution(solution: DiscreteSeriesSet): FilteredDiscreteSol
     }
 }
 
-export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSolution): DiscreteSeriesValues[] {
+export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSolution,
+                                             summary: SummaryRule[]): DiscreteSeriesValues[] {
     // TODO: if we have any array variables, this is going to need
     // some work, but that's the case all through the package and
     // currently prevented by mrc-3468.
@@ -185,10 +200,6 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
     const i = solution.info.map((el) => el.name).indexOf(name);
     const state = solution.state;
     const first = state.getTrace(i, 0);
-
-    const summary = [
-        { description: "Mean", summary: mean }
-    ];
 
     let isStochastic = false;
     const y: number[][] = [];

@@ -1,7 +1,7 @@
 import { Times, TimeMode } from "@reside-ic/odinjs";
 
 import { dustStateTime } from "../src/state-time";
-import { meanArray, seq, seqBy } from "../src/util";
+import { mean, meanArray, seq, seqBy } from "../src/util";
 import {
     batchRunDiscrete,
     filterIndex,
@@ -65,10 +65,11 @@ describe("summarise discrete model output", () => {
         { dim: [1], length: 1, name: "z" }
     ];
     const solution = { info, state, times };
+    const summary = [{ description: "Mean", summary: mean }];
 
     it("can collapse entirely deterministic output", () => {
         data.fill(0);
-        expect(tidyDiscreteSolution(solution)).toStrictEqual({
+        expect(tidyDiscreteSolution(solution, summary)).toStrictEqual({
             x: times,
             values: [
                 { description: "Deterministic", name: "x", y: rep(0, 4) },
@@ -82,7 +83,7 @@ describe("summarise discrete model output", () => {
         data.fill(0);
         const trace = state.viewTrace(1, 2); // trace 1 (2nd), particle 2 (3rd)
         trace.set(2, 1);
-        const res1 = tidyDiscreteSolutionVariable("y", solution);
+        const res1 = tidyDiscreteSolutionVariable("y", solution, summary);
         const y1 = {
             description: "Individual",
             name: "y",
@@ -94,7 +95,7 @@ describe("summarise discrete model output", () => {
         const z = { description: "Deterministic", name: "z", y: rep(0, 4) };
         const expected = [y1, y1, y2, y1, y1, y3];
         expect(res1).toStrictEqual(expected);
-        const res = tidyDiscreteSolution(solution);
+        const res = tidyDiscreteSolution(solution, summary);
         expect(res).toEqual({
             x: times,
             values: [x, ...expected, z]
