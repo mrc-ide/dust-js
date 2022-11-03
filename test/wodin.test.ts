@@ -248,7 +248,7 @@ describe("can run batch", () => {
             .toThrow("All solutions failed; first error: Expected 'sd' to be at least 0");
     });
 
-    it.only("can customise summary statistics", () => {
+    it("can customise summary statistics", () => {
         const min = (x: number[]) => Math.min(...x);
         const max = (x: number[]) => Math.max(...x);
         const summary = [
@@ -294,7 +294,6 @@ describe("can run batch", () => {
         // the different min/max types here somehow, probably an issue
         // in the summary code in odin....
         const end = res.valueAtTime(10);
-        console.log(end);
         expect(end.x).toStrictEqual(pars.values);
         expect(end.values.length).toBe(1);
         expect(end.values[0].name).toBe("x");
