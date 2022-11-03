@@ -137,6 +137,9 @@ export function runModelDiscrete(Model: DustModelConstructable,
  * @param dt The size of each step
  *
  * @param nParticles The number of independent particles (replicates) to run
+ *
+ * @param summary An array of summary rules to apply over stochastic
+ * traces. Defaults to just the mean.
  */
 export function wodinRunDiscrete(Model: DustModelConstructable,
                                  pars: UserType, timeStart: number, timeEnd: number,
@@ -251,6 +254,9 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
  * @param dt The size of each step
  *
  * @param nParticles The number of independent particles (replicates) to run
+ *
+ * @param summary An array of summary rules to apply over stochastic
+ * traces. Defaults to just the mean.
  */
 export function batchRunDiscrete(Model: DustModelConstructable, pars: BatchPars,
                                  timeStart: number, timeEnd: number,
