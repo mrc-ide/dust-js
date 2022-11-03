@@ -180,7 +180,7 @@ describe("can run batch", () => {
         const traces0 = res.solutions[0](allTimes);
         expect(traces0.x).toStrictEqual(seq(0, 100).map((x) => x * dt));
         expect(traces0.values).toStrictEqual(
-            [{ name: "x", y: Array(101).fill(0) }]);
+            [{ description: "Deterministic", name: "x", y: Array(101).fill(0) }]);
         const traces1 = res.solutions[1](allTimes);
         expect(traces1.values.length).toBe(1);
         expect(traces1.values[0].name).toBe("x");
@@ -246,5 +246,65 @@ describe("can run batch", () => {
         const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
         expect(() => res.run())
             .toThrow("All solutions failed; first error: Expected 'sd' to be at least 0");
+    });
+
+    it.only("can customise summary statistics", () => {
+        const min = (x: number[]) => Math.min(...x);
+        const max = (x: number[]) => Math.max(...x);
+        const summary = [
+            { description: "Min", summary: min },
+            { description: "Mean", summary: mean },
+            { description: "Max", summary: max }
+        ];
+
+        const tEnd = 10;
+        const dt = 0.1;
+        const nParticles = 7;
+        const pars = {
+            base: {n: 1, sd: 0},
+            name: "sd",
+            values: [0, 1, 10, 100]
+        };
+        const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles,
+                                     summary);
+        res.run();
+        expect(res.solutions.length).toBe(4);
+        expect(res.errors).toStrictEqual([]);
+        const traces0 = res.solutions[0](allTimes);
+        expect(traces0.x).toStrictEqual(seq(0, 100).map((x) => x * dt));
+        expect(traces0.values).toStrictEqual(
+            [{ description: "Deterministic", name: "x", y: Array(101).fill(0) }]);
+        const traces1 = res.solutions[1](allTimes);
+        expect(traces1.values.length).toBe(3);
+        expect(traces1.values[0].name).toBe("x");
+        expect(traces1.values.map((el) => el.name))
+            .toStrictEqual(["x", "x", "x"]);
+        // TODO: this is the issue with playing loose with types here,
+        // will need to fix this in odin-js I think.
+        expect(traces1.values.map((el) => (el as any).description))
+            .toStrictEqual(["Min", "Mean", "Max"]);
+        expect(traces1.values[0].y.slice(1).every((x) => x !== 0)).toBe(true);
+        // satisfy Min <= Mean <= Max everywhere:
+        const ordered = traces1.x.map((_: any, i: number) => (
+            (traces1.values[0].y[i] <= traces1.values[1].y[i]) &&
+                (traces1.values[1].y[i] <= traces1.values[2].y[i])));
+        expect(ordered.every((x) => x)).toBe(true);
+
+        // TODO: this is not working properly; we've not ended up with
+        // the different min/max types here somehow, probably an issue
+        // in the summary code in odin....
+        const end = res.valueAtTime(10);
+        console.log(end);
+        expect(end.x).toStrictEqual(pars.values);
+        expect(end.values.length).toBe(1);
+        expect(end.values[0].name).toBe("x");
+        expect(end.values[0].y).toStrictEqual(res.solutions.map((el) => el(allTimes).values[0].y[100]));
+
+        const ymax = res.extreme("yMax");
+        expect(ymax.x).toStrictEqual(pars.values);
+        expect(ymax.values.length).toBe(1);
+        expect(ymax.values[0].name).toBe("x");
+        expect(ymax.values[0].y).toStrictEqual(
+            res.solutions.map((el) => Math.max(...el(allTimes).values[0].y)));
     });
 });

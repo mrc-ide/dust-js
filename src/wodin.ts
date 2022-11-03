@@ -254,9 +254,10 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
  */
 export function batchRunDiscrete(Model: DustModelConstructable, pars: BatchPars,
                                  timeStart: number, timeEnd: number,
-                                 dt: number, nParticles: number): Batch {
+                                 dt: number, nParticles: number,
+                                 summary?: SummaryRule[]): Batch {
     const run = (p: UserType, t0: number, t1: number) =>
-        centralOnly(wodinRunDiscrete(Model, p, t0, t1, dt, nParticles));
+        centralOnly(wodinRunDiscrete(Model, p, t0, t1, dt, nParticles, summary));
     return new Batch(run, pars, timeStart, timeEnd);
 }
 
@@ -266,8 +267,7 @@ export function centralOnly(solution: FilteredDiscreteSolution): InterpolatedSol
 
 export function filterToCentralOnly(result: DiscreteSeriesSet): SeriesSet {
     const values = result.values
-        .filter((el: DiscreteSeriesValues) => el.description !== "Individual")
-        .map((el: DiscreteSeriesValues) => ({ name: el.name, y: el.y }));
+        .filter((el: DiscreteSeriesValues) => el.description !== "Individual");
     return {
         x: result.x,
         values
