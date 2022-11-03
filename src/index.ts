@@ -16,5 +16,6 @@ export {
     DiscreteSeriesSet,
     DiscreteSeriesValues,
     FilteredDiscreteSolution,
+    SummaryRule,
     wodinRunDiscrete
 } from "./wodin";
