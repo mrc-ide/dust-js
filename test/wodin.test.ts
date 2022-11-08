@@ -279,9 +279,8 @@ describe("can run batch", () => {
         expect(traces1.values[0].name).toBe("x");
         expect(traces1.values.map((el) => el.name))
             .toStrictEqual(["x", "x", "x"]);
-        // TODO: this is the issue with playing loose with types here,
-        // will need to fix this in odin-js I think.
-        expect(traces1.values.map((el) => (el as any).description))
+
+        expect(traces1.values.map((el) => el.description))
             .toStrictEqual(["Min", "Mean", "Max"]);
         expect(traces1.values[0].y.slice(1).every((x) => x !== 0)).toBe(true);
         // satisfy Min <= Mean <= Max everywhere:
@@ -290,20 +289,37 @@ describe("can run batch", () => {
                 (traces1.values[1].y[i] <= traces1.values[2].y[i])));
         expect(ordered.every((x) => x)).toBe(true);
 
-        // TODO: this is not working properly; we've not ended up with
-        // the different min/max types here somehow, probably an issue
-        // in the summary code in odin....
         const end = res.valueAtTime(10);
         expect(end.x).toStrictEqual(pars.values);
-        expect(end.values.length).toBe(1);
+        expect(end.values.length).toBe(3);
         expect(end.values[0].name).toBe("x");
-        expect(end.values[0].y).toStrictEqual(res.solutions.map((el) => el(allTimes).values[0].y[100]));
+        expect(end.values[0].description).toBe("Min");
+        expect(end.values[1].name).toBe("x");
+        expect(end.values[1].description).toBe("Mean");
+        expect(end.values[2].name).toBe("x");
+        expect(end.values[2].description).toBe("Max");
+        // Some total contortion here to compare the final values; the
+        // bulk of testing for this logic is done in odin-js though:
+        const lastTime = {mode: TimeMode.Given as const, times: [tEnd]};
+        const yend = summary.map((_, i) => res.solutions.map((s, j) => s(lastTime).values[j == 0 ? 0 : i].y[0]));
+        expect(end.values.map((el) => el.y)).toStrictEqual(yend);
 
         const ymax = res.extreme("yMax");
         expect(ymax.x).toStrictEqual(pars.values);
-        expect(ymax.values.length).toBe(1);
+        expect(ymax.values.length).toBe(3);
+
         expect(ymax.values[0].name).toBe("x");
+        expect(ymax.values[0].description).toBe("Min");
+        expect(ymax.values[1].name).toBe("x");
+        expect(ymax.values[1].description).toBe("Mean");
+        expect(ymax.values[2].name).toBe("x");
+        expect(ymax.values[2].description).toBe("Max");
+
         expect(ymax.values[0].y).toStrictEqual(
             res.solutions.map((el) => Math.max(...el(allTimes).values[0].y)));
+        expect(ymax.values[1].y).toStrictEqual(
+            res.solutions.map((el, j) => Math.max(...el(allTimes).values[j == 0 ? 0 : 1].y)));
+        expect(ymax.values[2].y).toStrictEqual(
+            res.solutions.map((el, j) => Math.max(...el(allTimes).values[j == 0 ? 0 : 2].y)));
     });
 });
