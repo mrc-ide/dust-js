@@ -11,31 +11,40 @@ import { Dust } from "./dust";
 import type { DustModel, DustModelInfo, DustModelConstructable, UserType } from "./model";
 import type { DustStateTime } from "./state-time";
 import {
+    applyArray,
     findClosest,
     isEqualArray,
-    meanArray,
+    mean,
     seq,
     seqBy
 } from "./util";
 
 /**
- * Describes the role that each series plays
+ * Convert a slice of a series at a single time point into a single
+ * summary value
  */
-export enum DiscreteSeriesMode {
-    /** An individual stochastic trace */
-    Individual = "Individual",
-    /** The mean over several Individual trace */
-    Mean = "Mean",
-    /** A single trace for where no variation was observed across all replicates (particles) */
-    Deterministic = "Deterministic"
+export interface SummaryRule {
+    /** Description of this summary, should use an initial capital */
+    description: string;
+    /** The actual transformation function */
+    summary: (x: number[]) => number;
 }
 
 /**
  * A single series, most likely within a {@link DiscreteSeriesSet}
  */
 export interface DiscreteSeriesValues {
-    /** The mode that the series plays */
-    mode: DiscreteSeriesMode;
+    /**
+     * The description of the series. There are a couple of special values:
+     *
+     * * Individual: an individual stochastic trace
+     * * Deterministic: A single trace for where no variation was
+     *   observed across all replicates (particles)
+     *
+     * Otherwise, the description is derived from the summary
+     * function.
+     */
+    description: string;
     /** The name of the series */
     name: string;
     /** The values of the variable within the series */
@@ -60,11 +69,10 @@ export interface DiscreteSeriesSet {
      * * Traces corresponding to a single logical model variable will
      *   be adjacent to each other, and these will be in the same
      *   order as the model metadata.
-     * * `Individual` traces will always appear before the single
-     *   `Mean` trace
-     * * For a given value in `names`, there will either be at least
-     *   one `Individual` trace, followed by exactly one `Mean` trace
-     *   or there will be a single `Deterministic` trace
+     * * Individual traces (which have a `description` value of
+     *   `"Individual"` will always appear before any summary traces,
+     *   but are omitted in the case where all individual traces are
+     *   identical.
      */
     values: DiscreteSeriesValues[];
 }
@@ -129,23 +137,28 @@ export function runModelDiscrete(Model: DustModelConstructable,
  * @param dt The size of each step
  *
  * @param nParticles The number of independent particles (replicates) to run
+ *
+ * @param summary An array of summary rules to apply over stochastic
+ * traces. Defaults to just the mean.
  */
 export function wodinRunDiscrete(Model: DustModelConstructable,
                                  pars: UserType, timeStart: number, timeEnd: number,
-                                 dt: number, nParticles: number): FilteredDiscreteSolution {
+                                 dt: number, nParticles: number,
+                                 summary?: SummaryRule[]): FilteredDiscreteSolution {
+    if (!summary) {
+        summary = [{ description: "Mean", summary: mean }];
+    }
     const solution = runModelDiscrete(Model, pars, timeStart, timeEnd, dt, nParticles);
-    return filterSolution(tidyDiscreteSolution(solution));
+    return filterSolution(tidyDiscreteSolution(solution, summary));
 }
 
-export function tidyDiscreteSolution(solution: DiscreteSolution): DiscreteSeriesSet {
+export function tidyDiscreteSolution(solution: DiscreteSolution, summary: SummaryRule[]): DiscreteSeriesSet {
     const names: string[] = [];
     const x = solution.times;
     const y: number[][] = [];
-    const mode: DiscreteSeriesMode[] = [];
-
     const values = [] as DiscreteSeriesValues[];
     solution.info.forEach((el) => {
-        const sol = tidyDiscreteSolutionVariable(el.name, solution);
+        const sol = tidyDiscreteSolutionVariable(el.name, solution, summary);
         values.push(...sol);
     });
 
@@ -174,7 +187,8 @@ export function filterSolution(solution: DiscreteSeriesSet): FilteredDiscreteSol
     }
 }
 
-export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSolution): DiscreteSeriesValues[] {
+export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSolution,
+                                             summary: SummaryRule[]): DiscreteSeriesValues[] {
     // TODO: if we have any array variables, this is going to need
     // some work, but that's the case all through the package and
     // currently prevented by mrc-3468.
@@ -202,19 +216,21 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
 
     if (isStochastic) {
         const values = y.map((s) => ({
-            mode: DiscreteSeriesMode.Individual,
+            description: "Individual",
             name,
             y: s
         }));
-        values.push({
-            mode: DiscreteSeriesMode.Mean,
-            name,
-            y: meanArray(y)
+        summary.map((el) => {
+            values.push({
+                description: el.description,
+                name,
+                y: applyArray(y, el.summary)
+            });
         });
         return values;
     } else {
         return [{
-            mode: DiscreteSeriesMode.Deterministic,
+            description: "Deterministic",
             name,
             y: first
         }]
@@ -238,23 +254,26 @@ export function tidyDiscreteSolutionVariable(name: string, solution: DiscreteSol
  * @param dt The size of each step
  *
  * @param nParticles The number of independent particles (replicates) to run
+ *
+ * @param summary An array of summary rules to apply over stochastic
+ * traces. Defaults to just the mean.
  */
 export function batchRunDiscrete(Model: DustModelConstructable, pars: BatchPars,
                                  timeStart: number, timeEnd: number,
-                                 dt: number, nParticles: number): Batch {
+                                 dt: number, nParticles: number,
+                                 summary?: SummaryRule[]): Batch {
     const run = (p: UserType, t0: number, t1: number) =>
-        centralOnly(wodinRunDiscrete(Model, p, t0, t1, dt, nParticles));
+        summaryOnly(wodinRunDiscrete(Model, p, t0, t1, dt, nParticles, summary));
     return new Batch(run, pars, timeStart, timeEnd);
 }
 
-export function centralOnly(solution: FilteredDiscreteSolution): InterpolatedSolution {
-    return (times: Times) => filterToCentralOnly(solution(times));
+export function summaryOnly(solution: FilteredDiscreteSolution): InterpolatedSolution {
+    return (times: Times) => filterToSummaryOnly(solution(times));
 }
 
-export function filterToCentralOnly(result: DiscreteSeriesSet): SeriesSet {
+export function filterToSummaryOnly(result: DiscreteSeriesSet): SeriesSet {
     const values = result.values
-        .filter((el: DiscreteSeriesValues) => el.mode !== DiscreteSeriesMode.Individual)
-        .map((el: DiscreteSeriesValues) => ({ name: el.name, y: el.y }));
+        .filter((el: DiscreteSeriesValues) => el.description !== "Individual");
     return {
         x: result.x,
         values

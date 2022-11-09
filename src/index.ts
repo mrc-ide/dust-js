@@ -13,9 +13,9 @@ export { dustStateTime, DustStateTime } from "./state-time";
 export { versions } from "./versions";
 export {
     batchRunDiscrete,
-    DiscreteSeriesMode,
     DiscreteSeriesSet,
     DiscreteSeriesValues,
     FilteredDiscreteSolution,
+    SummaryRule,
     wodinRunDiscrete
 } from "./wodin";
