@@ -263,15 +263,15 @@ export function batchRunDiscrete(Model: DustModelConstructable, pars: BatchPars,
                                  dt: number, nParticles: number,
                                  summary?: SummaryRule[]): Batch {
     const run = (p: UserType, t0: number, t1: number) =>
-        centralOnly(wodinRunDiscrete(Model, p, t0, t1, dt, nParticles, summary));
+        summaryOnly(wodinRunDiscrete(Model, p, t0, t1, dt, nParticles, summary));
     return new Batch(run, pars, timeStart, timeEnd);
 }
 
-export function centralOnly(solution: FilteredDiscreteSolution): InterpolatedSolution {
-    return (times: Times) => filterToCentralOnly(solution(times));
+export function summaryOnly(solution: FilteredDiscreteSolution): InterpolatedSolution {
+    return (times: Times) => filterToSummaryOnly(solution(times));
 }
 
-export function filterToCentralOnly(result: DiscreteSeriesSet): SeriesSet {
+export function filterToSummaryOnly(result: DiscreteSeriesSet): SeriesSet {
     const values = result.values
         .filter((el: DiscreteSeriesValues) => el.description !== "Individual");
     return {
