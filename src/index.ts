@@ -19,3 +19,9 @@ export {
     SummaryRule,
     wodinRunDiscrete
 } from "./wodin";
+
+// We also need to rexport these:
+export {
+    batchParsDisplace,
+    batchParsRange
+} from "@reside-ic/odinjs"

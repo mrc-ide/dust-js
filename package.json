@@ -1,6 +1,6 @@
 {
     "name": "@reside-ic/dust",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Dust-like interface for js",
     "main": "index.js",
     "scripts": {
