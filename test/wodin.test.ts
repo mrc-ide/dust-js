@@ -168,10 +168,13 @@ describe("can run batch", () => {
         const tEnd = 10;
         const dt = 0.1;
         const nParticles = 7;
+        const sdValues = [0, 1, 10, 100];
         const pars = {
             base: {n: 1, sd: 0},
-            name: "sd",
-            values: [0, 1, 10, 100]
+            varying: [{
+                name: "sd",
+                values: sdValues
+            }]
         };
         const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
         res.run();
@@ -187,13 +190,13 @@ describe("can run batch", () => {
         expect(traces1.values[0].y.slice(1).every((x) => x !== 0)).toBe(true);
 
         const end = res.valueAtTime(10);
-        expect(end.x).toStrictEqual(pars.values);
+        expect(end.x).toStrictEqual(sdValues);
         expect(end.values.length).toBe(1);
         expect(end.values[0].name).toBe("x");
         expect(end.values[0].y).toStrictEqual(res.solutions.map((el) => el(allTimes).values[0].y[100]));
 
         const max = res.extreme("yMax");
-        expect(max.x).toStrictEqual(pars.values);
+        expect(max.x).toStrictEqual(sdValues);
         expect(max.values.length).toBe(1);
         expect(max.values[0].name).toBe("x");
         expect(max.values[0].y).toStrictEqual(
@@ -207,10 +210,13 @@ describe("can run batch", () => {
         const tEnd = 10;
         const dt = 0.1;
         const nParticles = 7;
+        const sdValues = [0, 1, 10, 100];
         const pars = {
             base: {n: 1, sd: 0},
-            name: "sd",
-            values: [0, 1, 10, 100]
+            varying: [{
+                name: "sd",
+                values: sdValues
+            }]
         };
         const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
         res.run();
@@ -223,14 +229,21 @@ describe("can run batch", () => {
         const tEnd = 10;
         const dt = 0.1;
         const nParticles = 7;
+        const sdValues = [-2, -1, 0, 1, 2];
         const pars = {
             base: {n: 1, sd: 0},
-            name: "sd",
-            values: [-2, -1, 0, 1, 2]
+            varying: [{
+                name: "sd",
+                values: sdValues
+            }]
         };
         const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
         res.run();
-        expect(res.pars.values).toStrictEqual([0, 1, 2]);
+        expect(res.successfulVaryingParams).toStrictEqual([
+            { sd: 0 },
+            { sd: 1 },
+            { sd: 2 }
+        ]);
         expect(res.solutions.length).toBe(3);
     });
 
@@ -240,8 +253,10 @@ describe("can run batch", () => {
         const nParticles = 7;
         const pars = {
             base: {n: 1, sd: 0},
-            name: "sd",
-            values: [-3, -2, -1]
+            varying: [{
+                name: "sd",
+                values: [-3, -2, -1]
+            }]
         };
         const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles);
         expect(() => res.run())
@@ -260,10 +275,13 @@ describe("can run batch", () => {
         const tEnd = 10;
         const dt = 0.1;
         const nParticles = 7;
+        const sdValues = [0, 1, 10, 100];
         const pars = {
             base: {n: 1, sd: 0},
-            name: "sd",
-            values: [0, 1, 10, 100]
+            varying: [{
+                name: "sd",
+                values: sdValues
+            }]
         };
         const res = batchRunDiscrete(models.Walk, pars, 0, tEnd, dt, nParticles,
                                      summary);
@@ -290,7 +308,7 @@ describe("can run batch", () => {
         expect(ordered.every((x) => x)).toBe(true);
 
         const end = res.valueAtTime(10);
-        expect(end.x).toStrictEqual(pars.values);
+        expect(end.x).toStrictEqual(sdValues);
         expect(end.values.length).toBe(3);
         expect(end.values[0].name).toBe("x");
         expect(end.values[0].description).toBe("Min");
@@ -305,7 +323,7 @@ describe("can run batch", () => {
         expect(end.values.map((el) => el.y)).toStrictEqual(yend);
 
         const ymax = res.extreme("yMax");
-        expect(ymax.x).toStrictEqual(pars.values);
+        expect(ymax.x).toStrictEqual(sdValues);
         expect(ymax.values.length).toBe(3);
 
         expect(ymax.values[0].name).toBe("x");
