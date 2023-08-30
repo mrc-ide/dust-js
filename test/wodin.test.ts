@@ -190,13 +190,19 @@ describe("can run batch", () => {
         expect(traces1.values[0].y.slice(1).every((x) => x !== 0)).toBe(true);
 
         const end = res.valueAtTime(10);
-        expect(end.x).toStrictEqual(sdValues);
+        const sdValuesUserTypes = [
+            { sd: 0 },
+            { sd: 1 },
+            { sd: 10 },
+            { sd: 100 },
+        ];
+        expect(end.x).toStrictEqual(sdValuesUserTypes);
         expect(end.values.length).toBe(1);
         expect(end.values[0].name).toBe("x");
         expect(end.values[0].y).toStrictEqual(res.solutions.map((el) => el(allTimes).values[0].y[100]));
 
         const max = res.extreme("yMax");
-        expect(max.x).toStrictEqual(sdValues);
+        expect(max.x).toStrictEqual(sdValuesUserTypes);
         expect(max.values.length).toBe(1);
         expect(max.values[0].name).toBe("x");
         expect(max.values[0].y).toStrictEqual(
@@ -308,7 +314,13 @@ describe("can run batch", () => {
         expect(ordered.every((x) => x)).toBe(true);
 
         const end = res.valueAtTime(10);
-        expect(end.x).toStrictEqual(sdValues);
+        const sdValuesUserTypes = [
+            { sd: 0 },
+            { sd: 1 },
+            { sd: 10 },
+            { sd: 100 },
+        ];
+        expect(end.x).toStrictEqual(sdValuesUserTypes);
         expect(end.values.length).toBe(3);
         expect(end.values[0].name).toBe("x");
         expect(end.values[0].description).toBe("Min");
@@ -323,7 +335,7 @@ describe("can run batch", () => {
         expect(end.values.map((el) => el.y)).toStrictEqual(yend);
 
         const ymax = res.extreme("yMax");
-        expect(ymax.x).toStrictEqual(sdValues);
+        expect(ymax.x).toStrictEqual(sdValuesUserTypes);
         expect(ymax.values.length).toBe(3);
 
         expect(ymax.values[0].name).toBe("x");
