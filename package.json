@@ -1,6 +1,6 @@
 {
     "name": "@reside-ic/dust",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "Dust-like interface for js",
     "main": "index.js",
     "scripts": {
@@ -38,7 +38,7 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
-        "@reside-ic/odinjs": "https://github.com/mrc-ide/odin-js/tarball/mrc-4455",
+        "@reside-ic/odinjs": "^0.1.3",
         "@reside-ic/random": "^0.0.3",
         "ndarray": "^1.0.19"
     }
