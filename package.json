@@ -38,7 +38,7 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
-        "@reside-ic/odinjs": "^0.1.1",
+        "@reside-ic/odinjs": "https://github.com/mrc-ide/odin-js/tarball/mrc-4455",
         "@reside-ic/random": "^0.0.3",
         "ndarray": "^1.0.19"
     }
