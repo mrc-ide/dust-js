@@ -2,7 +2,7 @@
 export function versions() {
     return {
         random: "0.0.3",
-        odinjs: "0.1.1",
-        dust: "0.0.4",
+        odinjs: "0.1.3",
+        dust: "0.0.5",
     };
 }
